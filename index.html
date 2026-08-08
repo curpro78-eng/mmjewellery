@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MM Jewellery — Heirlooms in the Making | Fine 916 Hallmark Jewellery</title>
+  <link rel="icon" href="logo.png">
+  <meta name="description"
+    content="MM Jewellery — premium 916 hallmark gold jewellery. Rings, necklaces, bangles, earrings and bridal collections, handcrafted and BIS certified.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ============ ANNOUNCEMENT BAR ============ -->
+  <!-- <div class="announce">
+    <div class="announce-track">
+      <span>916 Hallmark Certified Jewellery</span>
+      <span>Old Gold Exchange Available</span>
+      <span>New Festive Collection is Live</span>
+      <span>Lifetime Jewellery Maintenance</span>
+      <span>Exclusive Bridal Collection</span>
+      <span>Custom Jewellery Designs Available</span>
+      <span>Secure & Safe Online Payments</span>
+      <span>Elegant Gifts for Every Occasion</span>
+      <span>Wedding Collections Starting from ₹9,999</span>
+
+    </div>
+  </div> -->
+
+  <!-- ============ LIVE GOLD & SILVER RATES MARQUEE ============ -->
+  <div class="rates-marquee-bar" id="ratesMarqueeBar">
+    <div class="rates-marquee-track" id="ratesMarqueeTrack"></div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header id="siteHeader">
+    <div class="header-inner">
+      <button class="icon-btn hamburger" onclick="openDrawer('menuDrawer')" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <a href="#home" class="logo">
+        <img src="logo.png" alt="MM Jewellery" class="logo-img">
+      </a>
+
+      <nav class="nav-desktop" id="navDesktop">
+        <button class="nav-link" data-mega="cat">Shop by Category <svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+          </svg></button>
+        <button class="nav-link" data-mega="ear">Earrings <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+          </svg></button>
+        <button class="nav-link" data-mega="ring">Rings <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+          </svg></button>
+        <a href="#exchange" class="nav-link" style="display:flex;">Exchange</a>
+        <a href="#contact" class="nav-link" style="display:flex;">Visit Store</a>
+
+        <div class="mega" id="mega-cat">
+          <a href="#" data-filter="all">All Jewellery</a><a href="#" data-filter="earrings">Earrings</a><a href="#"
+            data-filter="pendants">Pendants</a>
+          <a href="#" data-filter="rings">Finger Rings</a><a href="#" data-filter="chains">Chains</a><a href="#"
+            data-filter="necklace">Necklaces</a>
+          <a href="#" data-filter="haram">Haram</a><a href="#" data-filter="bangles">Bangles</a><a href="#"
+            data-filter="bracelets">Bracelets</a>
+          <a href="#" data-filter="casting-ring">Casting Ring</a><a href="#" data-filter="casting-earrings">Casting Earrings</a>
+          <a href="#" data-filter="casting-pendant">Casting Pendant</a><a href="#" data-filter="casting-necklace">Casting Necklace</a>
+          <a href="#" data-filter="antique">Antique Jewellery</a><a href="#" data-filter="sets">Pendant & Earring
+            Sets</a><a href="#" data-filter="new">New Launch</a>
+        </div>
+        <div class="mega" id="mega-ear">
+          <a href="#" data-filter="earrings">All Earrings</a><a href="#" data-filter="earrings">Casting Studs</a><a
+            href="#" data-filter="earrings">Studs & Tops</a>
+          <a href="#" data-filter="earrings">Jhumkas</a><a href="#" data-filter="earrings">Drops & Danglers</a><a
+            href="#" data-filter="earrings">Hoops</a>
+          <a href="#" data-filter="earrings">Chandbali</a><a href="#" data-filter="earrings">Ear Cuffs</a><a href="#"
+            data-filter="earrings">Kids Earrings</a>
+        </div>
+        <div class="mega" id="mega-ring">
+          <a href="#" data-filter="rings">All Rings</a><a href="#" data-filter="rings">Casual Rings</a><a href="#"
+            data-filter="rings">Couple Rings</a>
+          <a href="#" data-filter="rings">Engagement Rings</a><a href="#" data-filter="rings">Men's Rings</a><a href="#"
+            data-filter="rings">Women's Rings</a>
+          <a href="#" data-filter="rings">Adjustable Rings</a><a href="#" data-filter="rings">Antique Rings</a>
+        </div>
+      </nav>
+
+      <div class="search-desktop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" stroke-linecap="round" />
+        </svg>
+        <input type="text" id="deskSearch" placeholder="Search fine jewellery…" autocomplete="off">
+        <button class="search-clear-btn" id="deskSearchClear" onclick="clearDesktopSearch()" aria-label="Clear search"
+          style="display:none;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div class="desk-dropdown" id="deskDropdown"></div>
+      </div>
+
+      <div class="head-actions">
+        <button class="icon-btn" onclick="openDrawer('cartDrawer')" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6h15l-1.5 9h-12z" />
+            <path d="M6 6 5 2H2" stroke-linecap="round" />
+            <circle cx="9" cy="20" r="1.4" />
+            <circle cx="17" cy="20" r="1.4" />
+          </svg>
+          <span class="badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE STICKY SEARCH -->
+  <div class="mobile-search-bar">
+    <div class="box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m21 21-4.3-4.3" stroke-linecap="round" />
+      </svg>
+      <input type="text" id="mobileSearchInput" placeholder="Search rings, chains, bangles…" autocomplete="off">
+      <button class="search-clear-btn" id="mobSearchClear" onclick="clearMobileSearch()" aria-label="Clear search"
+        style="display:none;">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="mob-dd" id="mobDropdown"></div>
+    </div>
+  </div>
+
+  <!-- ============ DRAWER OVERLAY ============ -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+
+  <!-- MENU DRAWER -->
+  <div class="drawer left" id="menuDrawer">
+    <button class="drawer-close" onclick="closeAllDrawers()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
+      </svg>
+    </button>
+    <h3>Explore MM</h3>
+    <div class="drawer-scroll">
+      <div class="accordion-menu">
+        <div class="acc-item">
+          <button class="acc-trigger" onclick="toggleAccordion(this)">Shop by Category
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <a href="#products" data-filter="all" onclick="closeAllDrawers()">All Jewellery</a>
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">Earrings</a>
+            <a href="#products" data-filter="pendants" onclick="closeAllDrawers()">Pendants</a>
+            <a href="#products" data-filter="rings" onclick="closeAllDrawers()">Finger Rings</a>
+            <a href="#products" data-filter="chains" onclick="closeAllDrawers()">Chains</a>
+            <a href="#products" data-filter="necklace" onclick="closeAllDrawers()">Necklaces</a>
+            <a href="#products" data-filter="haram" onclick="closeAllDrawers()">Haram</a>
+            <a href="#products" data-filter="bangles" onclick="closeAllDrawers()">Bangles</a>
+            <a href="#products" data-filter="bracelets" onclick="closeAllDrawers()">Bracelets</a>
+            <a href="#products" data-filter="casting-ring" onclick="closeAllDrawers()">Casting Ring</a>
+            <a href="#products" data-filter="casting-earrings" onclick="closeAllDrawers()">Casting Earrings</a>
+            <a href="#products" data-filter="casting-pendant" onclick="closeAllDrawers()">Casting Pendant</a>
+            <a href="#products" data-filter="casting-necklace" onclick="closeAllDrawers()">Casting Necklace</a>
+            <a href="#products" data-filter="antique" onclick="closeAllDrawers()">Antique Jewellery</a>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger" onclick="toggleAccordion(this)">Earrings Collection
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">All Earrings</a>
+            <a href="#products" data-filter="casting-earrings" onclick="closeAllDrawers()">Casting Earrings</a>
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">Studs & Tops</a>
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">Jhumkas</a>
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">Drop & Danglers</a>
+            <a href="#products" data-filter="earrings" onclick="closeAllDrawers()">Hoop Earrings</a>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger" onclick="toggleAccordion(this)">Rings Collection
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <a href="#products" data-filter="rings" onclick="closeAllDrawers()">All Rings</a>
+            <a href="#products" data-filter="casting-ring" onclick="closeAllDrawers()">Casting Ring</a>
+            <a href="#products" data-filter="rings" onclick="closeAllDrawers()">Engagement Rings</a>
+            <a href="#products" data-filter="rings" onclick="closeAllDrawers()">Couple Rings</a>
+            <a href="#products" data-filter="rings" onclick="closeAllDrawers()">Men's Rings</a>
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger" onclick="toggleAccordion(this)">Pendants & Necklaces
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" stroke-linecap="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <a href="#products" data-filter="pendants" onclick="closeAllDrawers()">All Pendants</a>
+            <a href="#products" data-filter="casting-pendant" onclick="closeAllDrawers()">Casting Pendant</a>
+            <a href="#products" data-filter="necklace" onclick="closeAllDrawers()">All Necklaces</a>
+            <a href="#products" data-filter="casting-necklace" onclick="closeAllDrawers()">Casting Necklace</a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:20px; display:flex; flex-direction:column; gap:2px;">
+        <a href="#exchange" style="padding:10px 2px; font-weight:600; color:var(--maroon); font-size:13.5px;"
+          onclick="closeAllDrawers()">Old Gold Exchange</a>
+        <a href="#testimonials" style="padding:10px 2px; font-weight:600; color:var(--maroon); font-size:13.5px;"
+          onclick="closeAllDrawers()">Customer Reviews</a>
+        <a href="#faq" style="padding:10px 2px; font-weight:600; color:var(--maroon); font-size:13.5px;"
+          onclick="closeAllDrawers()">FAQs</a>
+        <a href="#contact" style="padding:10px 2px; font-weight:600; color:var(--maroon); font-size:13.5px;"
+          onclick="closeAllDrawers()">Visit Our Store</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div class="drawer right" id="cartDrawer">
+    <div class="drawer-header">
+      <h3>Your Bag</h3>
+      <button class="drawer-close" onclick="closeAllDrawers()" aria-label="Close bag">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-scroll" id="cartList"></div>
+    <div class="cart-summary" id="cartSummary" style="display:none;">
+      <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">₹0</span></div>
+      <div class="sum-row"><span>Savings</span><span id="sumSaving" style="color:#2c7a4b;">−₹0</span></div>
+      <div class="sum-row total"><span>Grand Total</span><span id="sumTotal">₹0</span></div>
+      <button class="btn-gold" onclick="checkoutWhatsapp()">Checkout via WhatsApp</button>
+      <button class="btn-outline-maroon" id="clearBagBtn" onclick="clearCart(event)">Clear Bag</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-card">
+      <div class="hero-slides" id="heroSlides">
+        <div class="hero-slide hs1 active">
+          <picture style="width:100%; height:100%; display:flex;">
+            <source srcset="hero/3.png" media="(max-width: 899px)">
+            <source srcset="desktop image/d1.png" media="(min-width: 900px)">
+            <img src="desktop image/d1.png" alt="Signature Couture Edit"
+              style="width:100%; height:100%; object-fit:cover;" fetchpriority="low" width="1920" height="768"
+              data-first-enter-image="true">
+          </picture>
+        </div>
+        <div class="hero-slide hs2">
+          <picture style="width:100%; height:100%; display:flex;">
+            <source srcset="hero/4.png" media="(max-width: 899px)">
+            <source srcset="desktop image/d3.png" media="(min-width: 900px)">
+            <img src="desktop image/d3.png" alt="Signature Couture Edit"
+              style="width:100%; height:100%; object-fit:cover;" fetchpriority="low" width="1920" height="768"
+              data-first-enter-image="true">
+          </picture>
+        </div>
+        <div class="hero-slide hs3">
+          <picture style="width:100%; height:100%; display:flex;">
+            <source srcset="hero/1.png" media="(max-width: 899px)">
+            <source srcset="desktop image/d2.png" media="(min-width: 900px)">
+            <img src="desktop image/d4.png" alt="Signature Couture Edit"
+              style="width:100%; height:100%; object-fit:cover;" fetchpriority="low" width="1920" height="768"
+              data-first-enter-image="true">
+          </picture>
+        </div>
+        <div class="hero-slide hs4">
+          <picture style="width:100%; height:100%; display:flex;">
+            <source srcset="hero/2.png" media="(max-width: 899px)">
+            <source srcset="desktop image/d4.png" media="(min-width: 900px)">
+            <img src="desktop image/d2.png" alt="Signature Couture Edit"
+              style="width:100%; height:100%; object-fit:cover;" fetchpriority="low" width="1920" height="768"
+              data-first-enter-image="true">
+          </picture>
+        </div>
+      </div>
+      <div class="particles" id="particles"></div>
+      <div class="hero-content"></div>
+    </div>
+    <div class="hero-dots" id="heroDots">
+      <div class="hero-dot active"></div>
+      <div class="hero-dot"></div>
+      <div class="hero-dot"></div>
+      <div class="hero-dot"></div>
+    </div>
+  </section>
+
+  <!-- ============ LIVE GOLD & SILVER RATES MARQUEE ============ -->
+  <!-- <div class="rates-marquee-bar" id="ratesMarqueeBar">
+    <div class="rates-marquee-track" id="ratesMarqueeTrack"></div>
+  </div> -->
+
+  <!-- ============ SHOP BY COLLECTION ============ -->
+  <section class="section-pad" id="shopByCollSection">
+    <div class="section-head reveal">
+      <div class="eyebrow">Curated For You</div>
+      <h2 class="section-title">Shop by Collection</h2>
+    </div>
+    <div class="collection-scroll" id="collectionScroll"></div>
+  </section>
+
+  <!-- ============ FILTER BAR ============ -->
+  <div class="filter-bar" id="filterBar">
+    <div class="filter-row" id="chipRow"></div>
+  </div>
+
+  <!-- ============ PRODUCT GRID ============ -->
+  <section class="section-pad" style="padding-top:8px;" id="products">
+    <div class="section-head reveal" style="margin-bottom:6px;">
+      <div class="eyebrow">916 Hallmark · BIS Certified</div>
+      <h2 class="section-title">Fine Jewellery, Finely Chosen</h2>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+    <div class="load-more-wrap">
+      <button class="btn-line" id="loadMoreBtn" onclick="loadMore()">Load More Pieces</button>
+    </div>
+  </section>
+
+  <!-- ============ EXCHANGE OFFER ============ -->
+  <section class="section-pad" id="exchange">
+    <div class="exchange reveal">
+      <div class="exchange-grid">
+        <div class="exchange-content">
+          <div class="eyebrow" style="color:var(--gold-light); margin-bottom:12px; justify-content:flex-start;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Old Gold Exchange Program
+          </div>
+          <h2>Trade your old gold for something new</h2>
+          <p>Upgrade your pre-loved gold ornaments into timeless 916 Hallmark masterworks. Enjoy transparent melt testing, zero deduction options, and instant invoice adjustment — fair, fast, and 100% trustworthy.</p>
+
+          <div class="ex-steps">
+            <div class="ex-step">
+              <span class="step-num">01</span>
+              <div>
+                <b>Instant Purity & Weight Testing</b>
+                <p>Transparent evaluation right before your eyes</p>
+              </div>
+            </div>
+            <div class="ex-step">
+              <span class="step-num">02</span>
+              <div>
+                <b>100% Live Market Rate</b>
+                <p>Maximum value guaranteed with zero hidden fees</p>
+              </div>
+            </div>
+            <div class="ex-step">
+              <span class="step-num">03</span>
+              <div>
+                <b>Immediate Invoice Credit</b>
+                <p>Adjust valuation value instantly against your new purchase</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ex-ctas">
+            <a class="hero-cta" href="#contact">Get Instant Valuation <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:6px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+            <button class="ex-wa-btn" onclick="askWhatsapp('old-gold-exchange')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 21l2.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+              <span>WhatsApp Inquiry</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="exchange-card-side">
+          <div class="ex-feature-card">
+            <div class="ex-badge-top">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Exchange Guarantee</span>
+            </div>
+            <div class="ex-metrics">
+              <div class="ex-metric-box">
+                <div class="ex-metric-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                </div>
+                <div>
+                  <b>100%</b>
+                  <span>Best Market Rate</span>
+                </div>
+              </div>
+              <div class="ex-metric-box">
+                <div class="ex-metric-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                </div>
+                <div>
+                  <b>15 min</b>
+                  <span>Instant Valuation</span>
+                </div>
+              </div>
+              <div class="ex-metric-box">
+                <div class="ex-metric-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <b>916</b>
+                  <span>Hallmark Verified</span>
+                </div>
+              </div>
+            </div>
+            <div class="ex-card-footer">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--gold-light)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>100% Transparent In-Store Evaluation in Salem</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY CHOOSE US ============ -->
+  <section class="section-pad">
+    <div class="section-head reveal">
+      <div class="eyebrow">Our Promise</div>
+      <h2 class="section-title">Why Choose MM Jewellery</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--maroon-deep)" stroke-width="2">
+            <path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z" />
+          </svg></div><b>Hallmark Certified</b>
+        <p>Every piece BIS 916 hallmarked for guaranteed purity.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--maroon-deep)" stroke-width="2">
+            <path d="M12 21c-4-3-8-6-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 5-4 8-8 11Z" />
+          </svg></div><b>Premium Craftsmanship</b>
+        <p>Handcrafted by master artisans with decades of expertise.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--maroon-deep)" stroke-width="2">
+            <rect x="4" y="9" width="16" height="11" rx="2" />
+            <path d="M8 9V7a4 4 0 0 1 8 0v2" />
+          </svg></div><b>Secure Payments</b>
+        <p>100% encrypted checkout with trusted payment partners.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--maroon-deep)" stroke-width="2">
+            <path d="M3 12h13l-3-3m3 3-3 3" />
+            <path d="M16 6h2a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-2" />
+          </svg></div><b>Easy Returns</b>
+        <p>7-day hassle-free returns and exchange on all pieces.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS (AUTO SLIDER 2S) ============ -->
+  <section class="section-pad" id="testimonials" style="background:var(--grey);">
+    <div class="section-head reveal">
+      <div class="eyebrow">Loved By Customers</div>
+      <h2 class="section-title">Words From Our Family</h2>
+    </div>
+    <div class="test-slider-container">
+      <div class="test-track-wrap">
+        <div class="test-slides" id="testScroll"></div>
+      </div>
+      <div class="test-dots" id="testDots"></div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section-pad" id="faq">
+    <div class="section-head reveal">
+      <div class="eyebrow">Good to Know</div>
+      <h2 class="section-title">Frequently Asked</h2>
+    </div>
+    <div class="faq-list" id="faqList"></div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section-pad" id="contact">
+    <div class="section-head reveal">
+      <div class="eyebrow">Visit Us</div>
+      <h2 class="section-title">Come See the Sparkle</h2>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="map-box">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d322.3438197207481!2d78.14456447632057!3d11.65981836974412!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babf100337ab2c9%3A0x7553d3c619866796!2sMM%20jewellery!5e0!3m2!1sen!2sin!4v1784733845521!5m2!1sen!2sin"
+          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+      <div class="contact-card">
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" />
+            <circle cx="12" cy="9" r="2.5" />
+          </svg>
+          <div><b>Store Address</b><span>Arisipalayam Main Rd, near Kannan store, Arisipalayam, Salem (M.Corp.), Tamil
+              Nadu 636009</span></div>
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
+          </svg>
+          <div><b>Phone / WhatsApp</b><span>+91 99426 76753</span></div>
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m2 7 10 6 10-6" />
+          </svg>
+          <div><b>Email</b><span>mmjewellerystore@gmail.com</span></div>
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 3" />
+          </svg>
+          <div><b>Business Hours</b><span>Mon – Sun, 10:00 AM – 8:30 PM</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <a href="#home" class="logo">
+          <img src="logo.png" alt="MM Jewellery" class="logo-img">
+        </a>
+        <p>Premium 916 hallmark gold jewellery, handcrafted for every milestone — designed with heart, worn for a
+          lifetime.</p>
+        <div class="social-row">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8">
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" />
+            </svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8">
+              <path d="M14 9h3V6h-3a4 4 0 0 0-4 4v2H7v3h3v6h3v-6h3l1-3h-4v-2a1 1 0 0 1 1-1Z" />
+            </svg></a>
+          <a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8">
+              <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 21l2.05-5.4A8.5 8.5 0 1 1 21 11.5Z" />
+            </svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="#home">Home</a><a href="#products">Shop All</a><a href="#exchange">Old Gold Exchange</a><a
+          href="#testimonials">Reviews</a><a href="#faq">FAQs</a><a href="#contact">Contact Us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Stay In Gold Standard</h4>
+        <p style="font-size:12px; color:rgba(255,255,255,.6); margin-bottom:10px;">New launches & exclusive offers,
+          straight to your inbox.</p>
+        <div class="newsletter"><input type="email" placeholder="Your email address" id="newsEmail"><button
+            onclick="subscribeNews()">Join</button></div>
+        <div class="pay-icons"><span>UPI</span><span>Visa</span><span>Mastercard</span><span>RuPay</span><span>Net
+            Banking</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 MM Jewellery. All rights reserved. · Designed & crafted with care.</div>
+  </footer>
+
+  <!-- ============ QUICK VIEW MODAL ============ -->
+  <div class="qv-overlay" id="qvOverlay" onclick="closeQuickView()"></div>
+  <div class="qv-sheet" id="qvSheet" role="dialog" aria-modal="true"></div>
+
+  <!-- ============ FLOATING BUTTONS ============ -->
+  <div class="floating">
+    <button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <a class="fab call" href="tel:+919942676753" aria-label="Call store">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path
+          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
+      </svg>
+    </a>
+    <a class="fab whatsapp" id="fabWa" href="#" target="_blank" aria-label="WhatsApp us">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 21l2.05-5.4A8.5 8.5 0 1 1 21 11.5Z" />
+      </svg>
+    </a>
+  </div>
+
+  <!-- ============ TOAST NOTIFICATION ============ -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span id="toastMsg">Added to bag</span>
+  </div>
+
+  <!-- ============ FIREBASE SDK & CONFIG ============ -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

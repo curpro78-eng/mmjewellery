@@ -1,0 +1,4834 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MM Jewellery — Admin Dashboard</title>
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700&family=Playfair+Display:ital,wght@0,500;0,600&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Firebase (compat SDK) — safe to include even without a project; guarded with try/catch below -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    :root {
+      --maroon: #92003A;
+      --maroon-deep: #300708;
+      --maroon-light: #C0004D;
+      --gold: #D4AF37;
+      --gold-light: #F0D889;
+      --gold-deep: #A9812A;
+      --rose-gold: #C08A83;
+      --ivory: #FBF7EE;
+      --white: #FFFFFF;
+      --grey: #F1EEE6;
+      --ink: #1C1C1C;
+      --ink-soft: #5B5B5B;
+      --glass: rgba(255, 255, 255, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --shadow: 0 20px 50px rgba(146, 0, 58, 0.12);
+      --radius: 18px;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-sub: 'Playfair Display', serif;
+      --font-body: 'Poppins', sans-serif;
+      --sidebar-w: 250px;
+      --topbar-h: 66px;
+      --ok: #2c7a4b;
+      --warn: #b8790e;
+      --danger: #B3261E;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--grey);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img,
+    svg {
+      display: block;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: 13.5px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ::selection {
+      background: var(--gold-light);
+      color: var(--maroon-deep);
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    /* ---------------- LOGIN ---------------- */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(48, 7, 8, 0.84), rgba(28, 3, 5, 0.92)), url('Desktop image/d1.png') center/cover no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #loginScreen::before,
+    #loginScreen::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 175, 55, .18);
+    }
+
+    #loginScreen::before {
+      width: 420px;
+      height: 420px;
+      top: -160px;
+      right: -140px;
+    }
+
+    #loginScreen::after {
+      width: 280px;
+      height: 280px;
+      bottom: -120px;
+      left: -90px;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      width: min(380px, 92vw);
+      background: rgba(255, 255, 255, .08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 24px;
+      padding: 36px 28px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .5);
+    }
+
+    .login-logo {
+      display: block;
+      max-width: 175px;
+      height: auto;
+      margin: 0 auto 12px;
+      filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5));
+    }
+
+    .login-card p.sub {
+      text-align: center;
+      color: var(--gold-light);
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: 12.5px;
+      letter-spacing: .1em;
+      margin: 6px 0 26px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, .7);
+      margin-bottom: 6px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+    }
+
+    .field input::placeholder {
+      color: rgba(255, 255, 255, .4);
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .btn-gold {
+      width: 100%;
+      padding: 13px;
+      border-radius: 30px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold) 55%, var(--gold-deep));
+      color: var(--maroon-deep);
+      font-weight: 700;
+      font-size: 13.5px;
+      box-shadow: 0 10px 24px rgba(169, 129, 42, .4);
+      transition: transform .18s;
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-2px);
+    }
+
+    .login-note {
+      margin-top: 16px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .5);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .mode-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--gold-light);
+      background: rgba(212, 175, 55, .12);
+      border: 1px solid rgba(212, 175, 55, .3);
+      padding: 7px 12px;
+      border-radius: 20px;
+    }
+
+    .mode-pill svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .login-error {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(220, 53, 69, .15);
+      border: 1px solid rgba(220, 53, 69, .4);
+      color: #ff6b7a;
+      font-size: 12px;
+      text-align: center;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .login-error.show {
+      display: block;
+      animation: shake .4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* ---------------- APP SHELL ---------------- */
+    #adminApp {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, var(--maroon-deep), #22050a);
+      color: rgba(255, 255, 255, .85);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 14px;
+      transition: transform .3s ease;
+    }
+
+    .side-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      margin-bottom: 14px;
+    }
+
+    .side-logo .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #fff7e0, var(--gold-light) 45%, var(--gold) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .side-logo .mark svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .side-logo b {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 17px;
+      color: #fff;
+    }
+
+    .side-logo small {
+      font-size: 8.5px;
+      letter-spacing: .25em;
+      color: var(--gold-light);
+    }
+
+    .side-nav {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .side-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .7);
+      margin-bottom: 2px;
+      transition: .2s;
+      width: 100%;
+      text-align: left;
+    }
+
+    .side-link svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+    }
+
+    .side-link:hover {
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
+    }
+
+    .side-link.active {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-deep));
+      color: var(--maroon-deep);
+      font-weight: 700;
+    }
+
+    .side-link .mini-badge {
+      margin-left: auto;
+      background: var(--maroon-light);
+      color: #fff;
+      font-size: 9.5px;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .side-link.active .mini-badge {
+      background: var(--maroon-deep);
+      color: var(--gold-light);
+    }
+
+    .side-foot {
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      padding-top: 14px;
+      margin-top: 10px;
+    }
+
+    .side-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .side-user .av {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--maroon-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: var(--font-sub);
+    }
+
+    .side-user b {
+      font-size: 12.5px;
+      display: block;
+      color: #fff;
+    }
+
+    .side-user span {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, .5);
+    }
+
+    .logout-btn {
+      margin-top: 12px;
+      width: 100%;
+      text-align: left;
+      font-size: 12px;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 4px;
+    }
+
+    .logout-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: var(--topbar-h);
+      background: rgba(251, 247, 238, .85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(212, 175, 55, .2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      gap: 14px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .side-toggle {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(146, 0, 58, .08);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .side-toggle svg {
+      width: 18px;
+      height: 18px;
+      color: var(--maroon);
+    }
+
+    .topbar h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--maroon);
+      font-weight: 700;
+    }
+
+    .demo-banner {
+      background: rgba(184, 121, 14, .12);
+      color: var(--warn);
+      border: 1px solid rgba(184, 121, 14, .3);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .demo-banner svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--maroon);
+      position: relative;
+    }
+
+    .topbar-icon:hover {
+      background: rgba(146, 0, 58, .08);
+    }
+
+    .topbar-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .tbadge {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 9px;
+      min-width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--ivory);
+    }
+
+    .content {
+      padding: 26px;
+      flex: 1;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* ---------------- CARDS / KPIs ---------------- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media(min-width:760px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 8px 22px rgba(146, 0, 58, .06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card .ic {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card .ic svg {
+      width: 19px;
+      height: 19px;
+      color: #fff;
+    }
+
+    .kpi-card .val {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--maroon);
+    }
+
+    .kpi-card .lbl {
+      font-size: 11.5px;
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    .kpi-card .trend {
+      font-size: 10.5px;
+      font-weight: 600;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    .trend.up {
+      color: var(--ok);
+    }
+
+    .trend.down {
+      color: var(--danger);
+    }
+
+    .panel {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 8px 22px rgba(146, 0, 58, .06);
+      margin-bottom: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .panel-head h3 {
+      font-family: var(--font-sub);
+      font-size: 16.5px;
+      color: var(--maroon);
+      font-weight: 600;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media(min-width:1000px) {
+      .two-col {
+        grid-template-columns: 1.4fr 1fr;
+      }
+    }
+
+    /* ---------------- TOOLBAR ---------------- */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border-radius: 30px;
+      border: 1px solid rgba(146, 0, 58, .15);
+      background: #fff;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--ink-soft);
+    }
+
+    .select-box select {
+      padding: 10px 14px;
+      border-radius: 30px;
+      border: 1px solid rgba(146, 0, 58, .15);
+      background: #fff;
+      font-weight: 600;
+      color: var(--maroon);
+      font-size: 12.5px;
+    }
+
+    .btn-maroon {
+      background: var(--maroon);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn-maroon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-line-sm {
+      border: 1.3px solid var(--maroon);
+      color: var(--maroon);
+      padding: 9px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-line-sm svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    /* ---------------- TABLE ---------------- */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(146, 0, 58, .08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+      background: #fff;
+    }
+
+    thead th {
+      background: var(--grey);
+      text-align: left;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--ink-soft);
+      padding: 12px 14px;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-top: 1px solid rgba(146, 0, 58, .06);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: rgba(212, 175, 55, .05);
+    }
+
+    .row-prod {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .row-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--grey);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .row-thumb svg,
+    .row-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .row-prod b {
+      font-family: var(--font-sub);
+      font-size: 13px;
+      display: block;
+      color: var(--maroon);
+    }
+
+    .row-prod span {
+      font-size: 10.5px;
+      color: var(--ink-soft);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .pill.ok {
+      background: rgba(44, 122, 75, .12);
+      color: var(--ok);
+    }
+
+    .pill.warn {
+      background: rgba(184, 121, 14, .12);
+      color: var(--warn);
+    }
+
+    .pill.danger {
+      background: rgba(179, 38, 30, .12);
+      color: var(--danger);
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-mini {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--grey);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--maroon);
+    }
+
+    .icon-mini svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .icon-mini.del:hover {
+      background: rgba(179, 38, 30, .12);
+      color: var(--danger);
+    }
+
+
+
+    .empty-row td {
+      text-align: center;
+      padding: 36px;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    /* ---------------- MODAL ---------------- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 5, 10, .5);
+      backdrop-filter: blur(3px);
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -46%);
+      width: min(720px, 92vw);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 22px;
+      z-index: 151;
+      opacity: 0;
+      pointer-events: none;
+      transition: .32s cubic-bezier(.22, 1, .36, 1);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .3);
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 24px;
+      border-bottom: 1px solid rgba(146, 0, 58, .08);
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+    }
+
+    .modal-head h3 {
+      font-family: var(--font-display);
+      font-size: 21px;
+      color: var(--maroon);
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grey);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .modal-body {
+      padding: 22px 24px 26px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media(min-width:640px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .form-grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .f-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .f-group input,
+    .f-group select,
+    .f-group textarea {
+      width: 100%;
+      padding: 10px 13px;
+      border-radius: 10px;
+      border: 1px solid rgba(146, 0, 58, .16);
+      background: var(--ivory);
+      font-size: 13px;
+    }
+
+    .f-group textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    .f-group input:focus,
+    .f-group select:focus,
+    .f-group textarea:focus {
+      outline: none;
+      border-color: var(--gold-deep);
+      background: #fff;
+    }
+
+    .span2 {
+      grid-column: 1/-1;
+    }
+
+    .drop-zone {
+      border: 2px dashed rgba(146, 0, 58, .25);
+      border-radius: 16px;
+      padding: 26px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      background: var(--ivory);
+    }
+
+    .drop-zone.drag {
+      border-color: var(--gold-deep);
+      background: rgba(212, 175, 55, .08);
+    }
+
+    .drop-zone svg {
+      width: 32px;
+      height: 32px;
+      color: var(--gold-deep);
+      margin: 0 auto 8px;
+    }
+
+    .drop-zone p {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+    }
+
+    .drop-zone b {
+      color: var(--maroon);
+    }
+
+    .img-preview-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .img-preview {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(146, 0, 58, .15);
+    }
+
+    .img-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .img-preview button {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      background: rgba(179, 38, 30, .85);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .img-preview button svg {
+      width: 9px;
+      height: 9px;
+    }
+
+    .compress-note {
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
+
+    .modal-foot {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding-top: 18px;
+      border-top: 1px solid rgba(146, 0, 58, .08);
+      margin-top: 6px;
+    }
+
+    .btn-cancel {
+      padding: 11px 20px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: var(--grey);
+    }
+
+    /* ---------------- ANALYTICS ---------------- */
+    .chart-box {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--ink-soft);
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* ---------------- TOAST ---------------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 300;
+      background: var(--maroon-deep);
+      color: var(--gold-light);
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: .3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .3);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 5, 10, .5);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .confirm-overlay.show {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 26px;
+      width: min(340px, 100%);
+      text-align: center;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .3);
+    }
+
+    .confirm-box svg {
+      width: 40px;
+      height: 40px;
+      color: var(--danger);
+      margin: 0 auto 12px;
+    }
+
+    .confirm-box h4 {
+      font-family: var(--font-sub);
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--maroon);
+    }
+
+    .confirm-box p {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .confirm-actions button {
+      flex: 1;
+      padding: 11px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .confirm-actions .cancel {
+      background: var(--grey);
+      color: var(--ink-soft);
+    }
+
+    .confirm-actions .del {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* ---------------- TOGGLE SWITCH ---------------- */
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ivory);
+      border: 1px solid rgba(146, 0, 58, .16);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 4px;
+    }
+
+    .switch-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex: 0 0 auto;
+      margin: 0;
+    }
+
+    .switch-wrapper input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      margin: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #cbd5e1;
+      transition: .3s cubic-bezier(.4, 0, .2, 1);
+      border-radius: 34px;
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s cubic-bezier(.4, 0, .2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .switch-wrapper input:checked+.switch-slider {
+      background-color: #2c7a4b;
+    }
+
+    .switch-wrapper input:checked+.switch-slider:before {
+      transform: translateX(22px);
+    }
+
+    textarea.mono {
+      font-family: monospace;
+      font-size: 11.5px;
+    }
+
+    @media(max-width:900px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .side-toggle {
+        display: flex;
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .4);
+        z-index: 70;
+        opacity: 0;
+        pointer-events: none;
+        transition: .3s;
+      }
+
+      .sidebar-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loginScreen">
+    <div class="login-card">
+      <img src="logo.png" alt="MM Jewellery" class="login-logo">
+      <p class="sub">ADMIN CONSOLE</p>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="mmjewellery@gmail.com" value="mmjewellery@gmail.com"
+          onkeydown="if(event.key==='Enter') handleLogin()">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter') handleLogin()">
+      </div>
+
+      <button class="btn-gold" id="loginBtn" onclick="handleLogin()">Sign In to Dashboard</button>
+      <div class="login-error" id="loginError"></div>
+
+      <div class="mode-pill" id="modePill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v4l3 2" />
+        </svg>
+        <span id="modeText">Checking Firebase connection…</span>
+      </div>
+      <p class="login-note">Enter your email &amp; password to sign in directly to your Admin Dashboard.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     ADMIN APP SHELL
+     ============================================================ -->
+  <div id="adminApp" class="hide">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-logo">
+        <img src="logo.png" alt="MM Jewellery" style="height:38px; width:auto; display:block;">
+        <div><small
+            style="font-size:9px; letter-spacing:.25em; color:var(--gold-light); display:block; margin-top:2px;">ADMIN
+            PANEL</small></div>
+      </div>
+      <nav class="side-nav" id="sideNav">
+        <button class="side-link active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+          </svg>Dashboard</button>
+        <button class="side-link" data-view="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+            <path d="M3 8v8l9 5 9-5V8" />
+            <path d="M12 13v8" />
+          </svg>Products <span class="mini-badge" id="navProdCount">0</span></button>
+        <button class="side-link" data-view="categories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <rect x="3" y="3" width="8" height="8" rx="2" />
+            <rect x="13" y="3" width="8" height="8" rx="2" />
+            <rect x="3" y="13" width="8" height="8" rx="2" />
+            <rect x="13" y="13" width="8" height="8" rx="2" />
+          </svg>Categories</button>
+
+        <!-- <button class="side-link" data-view="reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Reviews <span class="mini-badge" id="navReviewCount">0</span></button> -->
+        <!-- <button class="side-link" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Analytics</button> -->
+        <button class="side-link" data-view="rates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>Daily Gold & Silver Rates</button>
+        <button class="side-link" data-view="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+            <path d="M14 2v6h6" />
+          </svg>Import / Export</button>
+        <!-- <button class="side-link" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+          </svg>Settings</button> -->
+      </nav>
+      <div class="side-foot">
+        <div class="side-user">
+          <div class="av" id="userAvatar">A</div>
+          <div><b id="userNameLbl">Admin</b><span id="userRoleLbl">Super Admin</span></div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5" />
+            <path d="M21 12H9" />
+          </svg>Sign Out</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="side-toggle" onclick="toggleSidebar(true)"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+            </svg></button>
+          <h2 id="viewTitle">Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <div class="demo-banner" id="demoBanner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 9v4M12 17h.01" />
+              <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+            </svg>
+            Demo Mode — data is in-memory
+          </div>
+
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ================= DASHBOARD ================= -->
+        <section class="view active" id="view-dashboard">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="ic" style="background:var(--maroon);"><svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+                  <path d="M3 8v8l9 5 9-5V8" />
+                </svg></div>
+              <div class="val" id="kpiTotalProducts">0</div>
+              <div class="lbl">Total Products</div>
+            </div>
+
+            <!-- <div class="kpi-card"><div class="ic" style="background:var(--ok);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></div><div class="val" id="kpiReviews">0</div><div class="lbl">Pending Reviews</div></div> -->
+          </div>
+
+          <!-- Daily Gold & Silver Rates Quick Panel -->
+          <div class="panel" style="border: 2px solid var(--gold); background: linear-gradient(135deg, #FFFFFF, var(--ivory)); margin-bottom: 24px;">
+            <div class="panel-head">
+              <div>
+                <h3 style="color:var(--maroon); display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:20px;">⚡</span> Today's Live Gold & Silver Rates
+                </h3>
+                <span style="font-size:11.5px; color:var(--ink-soft);">Update daily market rates — changes automatically update on customer website marquee in real-time</span>
+              </div>
+              <span id="dashRateLastUpdated" style="font-size:11.5px; color:var(--maroon); font-style:italic; font-weight:600;"></span>
+            </div>
+            <div class="form-grid">
+              <div class="f-group">
+                <label>Today's 22K Gold Rate (₹ / gram)</label>
+                <input id="dashSetGoldRate" type="number" placeholder="7842" value="7842">
+              </div>
+              <div class="f-group">
+                <label>Today's 24K Gold Rate (₹ / gram)</label>
+                <input id="dashSetGold24k" type="number" placeholder="8550" value="8550">
+              </div>
+              <div class="f-group">
+                <label>Today's Silver Rate (₹ / gram)</label>
+                <input id="dashSetSilverRate" type="number" placeholder="98" value="98">
+              </div>
+            </div>
+            <div class="modal-foot" style="justify-content:flex-start; border:0; padding-top:14px;">
+              <button class="btn-gold" style="width:auto; padding:10px 24px;" onclick="saveDashRates()">Save & Update Live Rates</button>
+            </div>
+          </div>
+
+
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recently Added Products</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= RATES MANAGEMENT ================= -->
+        <section class="view" id="view-rates">
+          <div class="panel" style="border: 1.5px solid var(--gold);">
+            <div class="panel-head">
+              <h3>Live Gold & Silver Rate Management</h3>
+              <span style="font-size:11.5px; color:var(--maroon); font-style:italic; font-weight:600;" id="ratesViewLastUpdated"></span>
+            </div>
+            <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; line-height:1.6;">
+              Update today's live Gold (22K & 24K) and Silver rates below. Once saved, rates automatically push to Firestore and update the customer website scrolling marquee in real-time without requiring a page refresh.
+            </p>
+            <div class="form-grid">
+              <div class="f-group"><label>Today's 22K Gold Rate (₹ / gram)</label><input id="ratesViewGold22k" type="number" value="7842"></div>
+              <div class="f-group"><label>Today's 24K Gold Rate (₹ / gram)</label><input id="ratesViewGold24k" type="number" value="8550"></div>
+              <div class="f-group"><label>Today's Silver Rate (₹ / gram)</label><input id="ratesViewSilver" type="number" value="98"></div>
+            </div>
+            <div class="modal-foot" style="justify-content:flex-start; border:0; padding-top:16px;">
+              <button class="btn-gold" style="width:auto; padding:11px 26px;" onclick="saveViewRates()">Save & Push Live Rates</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= PRODUCTS ================= -->
+        <section class="view" id="view-products">
+          <div class="panel">
+            <div class="toolbar">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input type="text" id="prodSearch" placeholder="Search by name, code, category…">
+              </div>
+              <div class="select-box"><select id="prodCatFilter"></select></div>
+              <button class="btn-maroon" onclick="openProductModal()"><svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.4">
+                  <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                </svg>Add Product</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:60px; text-align:center;">S.No</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>V.A</th>
+                    <th>Purity</th>
+                    <th>Price</th>
+                    <th>Visibility</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= CATEGORIES ================= -->
+        <section class="view" id="view-categories">
+          <div class="panel">
+            <div class="toolbar">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input type="text" id="catSearch" placeholder="Search categories…">
+              </div>
+              <button class="btn-maroon" onclick="openCategoryModal()"><svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.4">
+                  <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                </svg>Add Category</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Slug</th>
+                    <th>Products</th>
+                    <th>Display Order</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categoriesTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+
+        <!-- ================= REVIEWS ================= -->
+        <!-- <section class="view" id="view-reviews">
+        <div class="panel">
+          <div class="panel-head"><h3>Customer Reviews</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Customer</th><th>Product</th><th>Rating</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="reviewsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section> -->
+
+        <!-- ================= ANALYTICS ================= -->
+        <section class="view" id="view-analytics">
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Weekly Enquiries (WhatsApp + Calls)</h3>
+              </div>
+              <div class="chart-box"><svg id="lineChart" viewBox="0 0 560 220" width="100%" height="220"></svg></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Products by Category</h3>
+              </div>
+              <div class="chart-box"><svg id="donutChart" viewBox="0 0 220 220" width="220" height="220"
+                  style="margin:0 auto; display:block;"></svg></div>
+              <div class="legend" id="donutLegend"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Top Performing Products (by margin)</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Margin %</th>
+                  </tr>
+                </thead>
+                <tbody id="topProdTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= REPORTS / IMPORT-EXPORT ================= -->
+        <section class="view" id="view-reports">
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Export Data</h3>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; line-height:1.7;">Download your
+                full product catalogue in JSON format for backup or offline editing.</p>
+              <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <button class="btn-line-sm" onclick="exportData()"><svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+                    <path d="M14 2v6h6" />
+                  </svg>Export JSON</button>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Import Data</h3>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px; line-height:1.7;">Upload a .json
+                file matching the product structure to bulk-add or update items.</p>
+              <div class="drop-zone" id="importDrop" onclick="document.getElementById('importFile').click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="M17 8l-5-5-5 5" />
+                  <path d="M12 3v12" />
+                </svg>
+                <p><b>Click to upload</b> or drag a .json file here</p>
+              </div>
+              <input type="file" id="importFile" accept=".json" class="hide" onchange="handleImportFile(event)">
+              <div id="importStatus" style="font-size:12px; color:var(--ink-soft); margin-top:12px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section class="view" id="view-settings">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Firebase Configuration</h3><span style="font-size:11.5px; color:var(--ink-soft);">Connect a real
+                project to move out of Demo Mode</span>
+            </div>
+            <div class="form-grid">
+              <div class="f-group"><label>API Key</label><input id="fbApiKey" placeholder="AIzaSy..."></div>
+              <div class="f-group"><label>Auth Domain</label><input id="fbAuthDomain"
+                  placeholder="mmjewellery.firebaseapp.com"></div>
+              <div class="f-group"><label>Project ID</label><input id="fbProjectId" placeholder="mmjewellery"></div>
+              <div class="f-group"><label>Storage Bucket</label><input id="fbStorageBucket"
+                  placeholder="mmjewellery.appspot.com"></div>
+              <div class="f-group"><label>Messaging Sender ID</label><input id="fbSenderId" placeholder="1234567890">
+              </div>
+              <div class="f-group"><label>App ID</label><input id="fbAppId" placeholder="1:1234567890:web:abc123"></div>
+            </div>
+            <div class="modal-foot" style="justify-content:flex-start; border:0; padding-top:16px;">
+              <button class="btn-maroon" onclick="connectFirebase()">Connect Firebase</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Store Settings</h3>
+            </div>
+            <div class="form-grid">
+              <div class="f-group"><label>Store Name</label><input id="setStoreName" value="MM Jewellery"></div>
+              <div class="f-group"><label>WhatsApp Business Number</label><input id="setWhatsapp"
+                  value="+91 99426 76753"></div>
+              <div class="f-group"><label>Store Address</label><input id="setAddress"
+                  value="Arisipalayam Main Rd, near Kannan store, Arisipalayam, Salem (M.Corp.), Tamil Nadu 636009">
+              </div>
+              <div class="f-group"><label>Today's 22K Rate (₹ / gram)</label><input id="setGoldRate" type="number" value="7842"></div>
+              <div class="f-group"><label>Today's 24K Rate (₹ / gram)</label><input id="setGold24k" type="number" value="8550"></div>
+              <div class="f-group"><label>Today's Silver Rate (₹ / gram)</label><input id="setSilverRate" type="number" value="98"></div>
+              <div class="f-group span2"><span id="rateLastUpdated" style="font-size:11.5px; color:var(--ink-soft); font-style:italic;"></span></div>
+            </div>
+            <div class="modal-foot" style="justify-content:flex-start; border:0; padding-top:16px;">
+              <button class="btn-maroon" onclick="saveStoreSettings()">Save Settings</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Firestore Data Structure (Reference)</h3>
+            </div>
+            <textarea class="mono span2"
+              style="width:100%; min-height:220px; border-radius:12px; border:1px solid rgba(146,0,58,.15); padding:14px; background:var(--ivory);"
+              readonly>
+/firestore
+ ├─ products/{productId}
+ │    name, code, category, subCategory, description, shortDescription,
+ │    grossWeight, netWeight, purity, karat, metalType, color,
+ │    originalPrice, salePrice,
+ │    availability, hallmark, whatsappNumber, displayOrder,
+ │    images: [base64 or storage URLs], createdAt, updatedAt
+ ├─ categories/{categoryId}
+ │    name, slug, parent, icon, displayOrder
+ ├─ reviews/{reviewId}
+ │    productId, customerName, rating, comment, verified, status
+ ├─ exchange/{entryId}
+ │    ratePerGram, purity, updatedAt
+ ├─ testimonials/{id}
+ │    name, location, rating, message
+ └─ admins/{uid}
+      email, role (super_admin | manager | staff), createdAt
+          </textarea>
+            <p style="font-size:11px; color:var(--ink-soft); margin-top:10px;">This admin panel writes to these
+              collections automatically once Firebase is connected above — until then, all changes are kept in-memory
+              for this session (Demo Mode).</p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     PRODUCT MODAL
+     ============================================================ -->
+  <div class="modal-overlay" id="prodModalOverlay" onclick="closeProductModal()"></div>
+  <div class="modal" id="prodModal">
+    <div class="modal-head">
+      <h3 id="prodModalTitle">Add Product</h3>
+      <button class="modal-close" onclick="closeProductModal()"><svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="drop-zone" id="prodDropZone" onclick="document.getElementById('prodImgInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="18" height="18" rx="3" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="m21 15-5-5L5 21" />
+        </svg>
+        <p><b>Click to upload</b> or drag & drop product image(s)</p>
+      </div>
+      <input type="file" id="prodImgInput" accept="image/*" multiple class="hide" onchange="handleProductImages(event)">
+      <div class="img-preview-row" id="imgPreviewRow"></div>
+      <p class="compress-note" id="compressNote"></p>
+
+      <div style="height:16px;"></div>
+      <div class="form-grid">
+        <div class="f-group"><label>Product Name *</label><input id="fName" placeholder="Vaidehi Daily Wear Bangle">
+        </div>
+        <div class="f-group"><label>Product Code *</label><input id="fCode" placeholder="AJ-116"></div>
+        <div class="f-group"><label>Category *</label><select id="fCategory"></select></div>
+        <div class="f-group"><label>Sub Category</label><input id="fSubCategory" list="subCatList" placeholder="e.g. Casting Ring, Casting Bangle">
+          <datalist id="subCatList">
+            <option value="Casting Ring">
+            <option value="Casting Earrings">
+            <option value="Casting Pendant">
+            <option value="Casting Necklace">
+            <option value="Casting Bangle">
+            <option value="Engagement Ring">
+            <option value="Designer Ring">
+            <option value="Bridal Necklace">
+          </datalist>
+        </div>
+        <div class="f-group"><label>Value Addition (V.A)</label><input id="fVa" placeholder="e.g. 8% or ₹1,200"></div>
+        <div class="f-group span2"><label>Short Description</label><input id="fShortDesc"
+            placeholder="One-line highlight for product cards"></div>
+        <div class="f-group span2"><label>Description</label><textarea id="fDesc"
+            placeholder="Full product description…"></textarea></div>
+        <div class="f-group"><label>Gross Weight (g)</label><input id="fGrossWt" type="number" step="0.1"
+            placeholder="11.2"></div>
+        <div class="f-group"><label>Net Weight (g)</label><input id="fNetWt" type="number" step="0.1"
+            placeholder="10.8"></div>
+        <div class="f-group"><label>Purity</label>
+          <select id="fPurity">
+            <option>24K/999</option>
+            <option selected>22K/916</option>
+            <option>18K/750</option>
+            <option>14K/585</option>
+          </select>
+        </div>
+        <div class="f-group"><label>Metal Type</label>
+          <select id="fMetal">
+            <option>Yellow Gold</option>
+            <option>Rose Gold</option>
+            <option>White Gold</option>
+            <option>Antique Gold</option>
+            <option>Silver</option>
+          </select>
+        </div>
+        <div class="f-group"><label>Color</label><input id="fColor" placeholder="Yellow"></div>
+        <div class="f-group"><label>Hallmark</label>
+          <select id="fHallmark">
+            <option>BIS 916 Hallmarked</option>
+            <option>BIS 750 Hallmarked</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+        <div class="f-group"><label>Original Price (₹)</label><input id="fMrp" type="number" placeholder="70000">
+        </div>
+        <div class="f-group"><label>Sale Price (₹)</label><input id="fPrice" type="number" placeholder="64500"></div>
+        <div class="f-group"><label>Availability</label>
+          <select id="fAvailability">
+            <option selected>Made to Order</option>
+          </select>
+        </div>
+        <div class="f-group"><label>Display Order</label><input id="fDisplayOrder" type="number" placeholder="1"></div>
+        <div class="f-group span2"><label>WhatsApp Number for Enquiries</label><input id="fWhatsapp"
+            placeholder="+91 98765 43210"></div>
+        <div class="f-group span2">
+          <div class="toggle-group">
+            <div>
+              <b style="font-size:13px; color:var(--maroon); display:block; margin-bottom:2px;">Product Visibility</b>
+              <span style="font-size:11px; color:var(--ink-soft);">Product is Available / Visible to customers</span>
+            </div>
+            <label class="switch-wrapper">
+              <input type="checkbox" id="fIsVisible" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeProductModal()">Cancel</button>
+        <button class="btn-gold" style="width:auto; padding:11px 26px;" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     CATEGORY MODAL
+     ============================================================ -->
+  <div class="modal-overlay" id="catModalOverlay" onclick="closeCategoryModal()"></div>
+  <div class="modal" id="catModal" style="width:min(460px,92vw);">
+    <div class="modal-head">
+      <h3 id="catModalTitle">Add Category</h3>
+      <button class="modal-close" onclick="closeCategoryModal()"><svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid full">
+        <div class="f-group"><label>Category Name *</label><input id="cName" placeholder="Bangles"></div>
+        <div class="f-group"><label>Slug</label><input id="cSlug" placeholder="bangles"></div>
+        <div class="f-group"><label>Display Order</label><input id="cOrder" type="number" placeholder="1"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeCategoryModal()">Cancel</button>
+        <button class="btn-gold" style="width:auto; padding:11px 26px;" onclick="saveCategory()">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     ADMIN PRODUCT DETAILS MODAL
+     ============================================================ -->
+  <div class="modal-overlay" id="adminProdDetailsOverlay" onclick="closeAdminProdDetailsModal()"></div>
+  <div class="modal" id="adminProdDetailsModal" style="width:min(600px, 94vw);">
+    <div class="modal-head">
+      <h3 id="adminProdDetailsTitle">Product Details</h3>
+      <button class="modal-close" onclick="closeAdminProdDetailsModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" id="adminProdDetailsBody" style="max-height:78vh; overflow-y:auto; padding:20px;"></div>
+  </div>
+
+  <!-- Confirm Delete -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" />
+      </svg>
+      <h4>Delete Product?</h4>
+      <p id="confirmBoxMsg">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="del" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="m5 13 4 4L19 7" />
+    </svg><span id="toastMsg">Saved</span></div>
+
+  <script>
+    /* ============================================================
+       MM JEWELLERY ADMIN — STATE & FIREBASE BOOTSTRAP
+       ============================================================ */
+    const $ = (s, c = document) => c.querySelector(s);
+    const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+    const rupee = n => (n && !isNaN(n) && Number(n) > 0) ? "₹" + Math.round(n).toLocaleString('en-IN') : "Price on Request";
+
+    var FIREBASE_READY = false;
+    var db = window.db || null, auth = window.auth || null;
+
+    let INITIAL_PRODUCTS = [
+      {
+        "id": "AJ-CST-101",
+        "name": "Royal Floral Casting Ring",
+        "code": "AJ-CST-101",
+        "category": "casting-ring",
+        "cat": "casting-ring",
+        "subCategory": "Casting Ring",
+        "va": "8%",
+        "valueAddition": "8%",
+        "shortDesc": "Intricately cast 22K gold ring.",
+        "desc": "BIS 916 hallmarked 22K yellow gold casting ring featuring elaborate micro-filigree details.",
+        "grossWt": 6.4,
+        "netWt": 6.1,
+        "wt": "6.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 48000,
+        "price": 44500,
+        "availability": "Made to Order",
+        "displayOrder": 1,
+        "tag": "NEW",
+        "images": ["images/classic_gold_ring.jpg"]
+      },
+      {
+        "id": "AJ-CST-102",
+        "name": "Devi Peacock Casting Earrings",
+        "code": "AJ-CST-102",
+        "category": "casting-earrings",
+        "cat": "casting-earrings",
+        "subCategory": "Casting Earrings",
+        "va": "10%",
+        "valueAddition": "10%",
+        "shortDesc": "Designer peacock 22K casting earrings.",
+        "desc": "Exquisite BIS 916 hallmarked 22K casting earrings inspired by royal peacock motifs.",
+        "grossWt": 9.2,
+        "netWt": 8.8,
+        "wt": "9.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 69000,
+        "price": 63800,
+        "availability": "Made to Order",
+        "displayOrder": 2,
+        "tag": "NEW",
+        "images": ["images/earrings.png"]
+      },
+      {
+        "id": "AJ-CST-103",
+        "name": "Lakshmi Divine Casting Pendant",
+        "code": "AJ-CST-103",
+        "category": "casting-pendant",
+        "cat": "casting-pendant",
+        "subCategory": "Casting Pendant",
+        "va": "7%",
+        "valueAddition": "7%",
+        "shortDesc": "Temple motif 22K casting pendant.",
+        "desc": "Sacred Goddess Lakshmi motif 22K BIS 916 hallmarked casting pendant with rich gold finish.",
+        "grossWt": 7.8,
+        "netWt": 7.5,
+        "wt": "7.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 56000,
+        "price": 51800,
+        "availability": "Made to Order",
+        "displayOrder": 3,
+        "tag": "NEW",
+        "images": ["images/pendant.png"]
+      },
+      {
+        "id": "AJ-CST-104",
+        "name": "Majestic Bridal Casting Necklace",
+        "code": "AJ-CST-104",
+        "category": "casting-necklace",
+        "cat": "casting-necklace",
+        "subCategory": "Casting Necklace",
+        "va": "12%",
+        "valueAddition": "12%",
+        "shortDesc": "Heavy bridal 22K casting necklace.",
+        "desc": "Opulent 22K BIS 916 hallmarked casting necklace with ornate traditional relief work.",
+        "grossWt": 32.5,
+        "netWt": 31.0,
+        "wt": "32.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 245000,
+        "price": 228000,
+        "availability": "Made to Order",
+        "displayOrder": 4,
+        "tag": "NEW",
+        "images": ["images/necklace.png"]
+      },
+      {
+        "id": "AJ-101",
+        "name": "Classic Gold Engagement Ring",
+        "code": "AJ-101",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Engagement Ring",
+        "va": "8%",
+        "valueAddition": "8%",
+        "shortDesc": "Elegant 22K gold engagement ring.",
+        "desc": "Beautifully crafted BIS 916 hallmarked 22K yellow gold engagement ring with a timeless finish suitable for everyday elegance.",
+        "grossWt": 5.8,
+        "netWt": 5.5,
+        "wt": "5.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 42000,
+        "price": 39500,
+        "availability": "Made to Order",
+        "displayOrder": 1,
+        "tag": "NEW",
+        "images": [
+          "images/classic_gold_ring.jpg"
+        ]
+      },
+      {
+        "id": "AJ-102",
+        "name": "Floral Designer Ring",
+        "code": "AJ-102",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Designer Ring",
+        "shortDesc": "Floral inspired gold ring.",
+        "desc": "Premium floral pattern ring made with 22K BIS hallmarked yellow gold for modern women.",
+        "grossWt": 6.1,
+        "netWt": 5.8,
+        "wt": "6.1g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 45500,
+        "price": 42900,
+        "availability": "Made to Order",
+        "displayOrder": 2,
+        "tag": "NEW",
+        "images": [
+          "images/emerald_cut_ring.jpg"
+        ]
+      },
+      {
+        "id": "AJ-103",
+        "name": "Twisted Gold Band",
+        "code": "AJ-103",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Band Ring",
+        "shortDesc": "Minimal twisted band ring.",
+        "desc": "Simple twisted yellow gold band with premium polish and BIS certification.",
+        "grossWt": 4.9,
+        "netWt": 4.6,
+        "wt": "4.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 36500,
+        "price": 34200,
+        "availability": "Made to Order",
+        "displayOrder": 3,
+        "tag": "NEW",
+        "images": [
+          "images/diamond_solitaire.jpg"
+        ]
+      },
+      {
+        "id": "AJ-104",
+        "name": "Traditional Peacock Ring",
+        "code": "AJ-104",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Temple Ring",
+        "shortDesc": "Peacock engraved ring.",
+        "desc": "Traditional temple style peacock ring crafted in 22K yellow gold.",
+        "grossWt": 7.2,
+        "netWt": 6.8,
+        "wt": "7.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 53500,
+        "price": 50500,
+        "availability": "Made to Order",
+        "displayOrder": 4,
+        "tag": "NEW",
+        "images": [
+          "images/ring.png"
+        ]
+      },
+      {
+        "id": "AJ-105",
+        "name": "Heart Shape Gold Ring",
+        "code": "AJ-105",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Fashion Ring",
+        "shortDesc": "Stylish heart design ring.",
+        "desc": "A trendy heart-shaped 22K gold ring suitable for gifting and daily wear.",
+        "grossWt": 5.6,
+        "netWt": 5.3,
+        "wt": "5.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 41800,
+        "price": 39200,
+        "availability": "Made to Order",
+        "displayOrder": 5,
+        "tag": "NEW",
+        "images": [
+          "images/classic_gold_ring.jpg"
+        ]
+      },
+      {
+        "id": "AJ-106",
+        "name": "Royal Bridal Necklace",
+        "code": "AJ-106",
+        "category": "necklace",
+        "cat": "necklace",
+        "subCategory": "Bridal Necklace",
+        "shortDesc": "Grand bridal necklace.",
+        "desc": "Luxurious bridal necklace crafted with intricate traditional gold work.",
+        "grossWt": 48.5,
+        "netWt": 46.8,
+        "wt": "48.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 355000,
+        "price": 339500,
+        "availability": "Made to Order",
+        "displayOrder": 6,
+        "tag": "NEW",
+        "images": [
+          "images/choker_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-107",
+        "name": "Elegant Gold Necklace",
+        "code": "AJ-107",
+        "category": "necklace",
+        "cat": "necklace",
+        "subCategory": "Daily Wear",
+        "shortDesc": "Lightweight daily necklace.",
+        "desc": "Modern lightweight necklace suitable for office and casual occasions.",
+        "grossWt": 18.2,
+        "netWt": 17.6,
+        "wt": "18.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 136000,
+        "price": 129500,
+        "availability": "Made to Order",
+        "displayOrder": 7,
+        "tag": "NEW",
+        "images": [
+          "images/pearl_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-108",
+        "name": "Temple Gold Necklace",
+        "code": "AJ-108",
+        "category": "necklace",
+        "cat": "necklace",
+        "subCategory": "Temple Jewellery",
+        "shortDesc": "Traditional temple necklace.",
+        "desc": "Classic temple-inspired necklace featuring premium handcrafted detailing.",
+        "grossWt": 35.7,
+        "netWt": 34.5,
+        "wt": "35.7g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 258000,
+        "price": 247500,
+        "availability": "Made to Order",
+        "displayOrder": 8,
+        "tag": "NEW",
+        "images": [
+          "images/necklace.png"
+        ]
+      },
+      {
+        "id": "AJ-109",
+        "name": "Classic Gold Haram",
+        "code": "AJ-109",
+        "category": "necklace",
+        "cat": "necklace",
+        "subCategory": "Long Necklace",
+        "shortDesc": "Traditional long haram.",
+        "desc": "Premium long gold haram with elegant handcrafted design.",
+        "grossWt": 42.8,
+        "netWt": 41.4,
+        "wt": "42.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 310000,
+        "price": 296000,
+        "availability": "Made to Order",
+        "displayOrder": 9,
+        "tag": "NEW",
+        "images": [
+          "images/choker_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-110",
+        "name": "Designer Gold Necklace",
+        "code": "AJ-110",
+        "category": "necklace",
+        "cat": "necklace",
+        "subCategory": "Designer",
+        "shortDesc": "Contemporary gold necklace.",
+        "desc": "Designer necklace combining traditional craftsmanship with modern styling.",
+        "grossWt": 22.4,
+        "netWt": 21.7,
+        "wt": "22.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 168500,
+        "price": 159900,
+        "availability": "Made to Order",
+        "displayOrder": 10,
+        "tag": "NEW",
+        "images": [
+          "images/pearl_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-111",
+        "name": "Daily Wear Gold Bangle",
+        "code": "AJ-111",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Daily Wear",
+        "shortDesc": "Comfortable everyday bangle.",
+        "desc": "Lightweight daily wear gold bangle with glossy finish.",
+        "grossWt": 10.9,
+        "netWt": 10.5,
+        "wt": "10.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 76500,
+        "price": 72900,
+        "availability": "Made to Order",
+        "displayOrder": 11,
+        "tag": "",
+        "images": [
+          "images/gold_kadas.jpg"
+        ]
+      },
+      {
+        "id": "AJ-112",
+        "name": "Casting Gold Bangle",
+        "code": "AJ-112",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Casting Bangle",
+        "shortDesc": "Premium casting bangle.",
+        "desc": "Crafted with precision casting technology for long-lasting shine.",
+        "grossWt": 12.8,
+        "netWt": 12.3,
+        "wt": "12.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 89200,
+        "price": 84800,
+        "availability": "Made to Order",
+        "displayOrder": 12,
+        "tag": "",
+        "images": [
+          "images/bangle.png"
+        ]
+      },
+      {
+        "id": "AJ-113",
+        "name": "Floral Gold Bangle",
+        "code": "AJ-113",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Designer Bangle",
+        "shortDesc": "Elegant floral bangle.",
+        "desc": "Intricate floral engraved yellow gold bangle with premium finish.",
+        "grossWt": 13.7,
+        "netWt": 13.2,
+        "wt": "13.7g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 95800,
+        "price": 91200,
+        "availability": "Made to Order",
+        "displayOrder": 13,
+        "tag": "",
+        "images": [
+          "images/gold_kadas.jpg"
+        ]
+      },
+      {
+        "id": "AJ-114",
+        "name": "Traditional Gold Kada",
+        "code": "AJ-114",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Kada",
+        "shortDesc": "Traditional handcrafted kada.",
+        "desc": "Classic gold kada suitable for festive and wedding occasions.",
+        "grossWt": 16.5,
+        "netWt": 15.9,
+        "wt": "16.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 118500,
+        "price": 113000,
+        "availability": "Made to Order",
+        "displayOrder": 14,
+        "tag": "",
+        "images": [
+          "images/bangle.png"
+        ]
+      },
+      {
+        "id": "AJ-115",
+        "name": "Premium Bridal Bangle",
+        "code": "AJ-115",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Bridal Bangle",
+        "shortDesc": "Luxury bridal gold bangle.",
+        "desc": "Premium bridal bangle designed with intricate traditional motifs.",
+        "grossWt": 20.8,
+        "netWt": 20.1,
+        "wt": "20.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 149500,
+        "price": 142000,
+        "availability": "Made to Order",
+        "displayOrder": 15,
+        "tag": "",
+        "images": [
+          "images/gold_kadas.jpg"
+        ]
+      },
+      {
+        "id": "AJ-116",
+        "name": "Classic Gold Bracelet",
+        "code": "AJ-116",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Men's Bracelet",
+        "shortDesc": "Premium men's bracelet.",
+        "desc": "Solid 22K gold bracelet designed for everyday luxury.",
+        "grossWt": 15.4,
+        "netWt": 14.8,
+        "wt": "15.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 112000,
+        "price": 106500,
+        "availability": "Made to Order",
+        "displayOrder": 16,
+        "tag": "",
+        "images": [
+          "images/tennis_bracelet.jpg"
+        ]
+      },
+      {
+        "id": "AJ-117",
+        "name": "Designer Gold Bracelet",
+        "code": "AJ-117",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Women's Bracelet",
+        "shortDesc": "Elegant women's bracelet.",
+        "desc": "Stylish handcrafted bracelet perfect for every occasion.",
+        "grossWt": 9.6,
+        "netWt": 9.2,
+        "wt": "9.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 69800,
+        "price": 66400,
+        "availability": "Made to Order",
+        "displayOrder": 17,
+        "tag": "",
+        "images": [
+          "images/bracelet.png"
+        ]
+      },
+      {
+        "id": "AJ-118",
+        "name": "Twisted Link Bracelet",
+        "code": "AJ-118",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Chain Bracelet",
+        "shortDesc": "Modern twisted bracelet.",
+        "desc": "Lightweight twisted chain bracelet with polished finish.",
+        "grossWt": 11.1,
+        "netWt": 10.7,
+        "wt": "11.1g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 81200,
+        "price": 77400,
+        "availability": "Made to Order",
+        "displayOrder": 18,
+        "tag": "",
+        "images": [
+          "images/tennis_bracelet.jpg"
+        ]
+      },
+      {
+        "id": "AJ-119",
+        "name": "Royal Gold Bracelet",
+        "code": "AJ-119",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Premium Bracelet",
+        "shortDesc": "Luxury handcrafted bracelet.",
+        "desc": "Premium handcrafted gold bracelet featuring elegant detailing.",
+        "grossWt": 18.4,
+        "netWt": 17.8,
+        "wt": "18.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 132000,
+        "price": 126500,
+        "availability": "Made to Order",
+        "displayOrder": 19,
+        "tag": "",
+        "images": [
+          "images/bracelet.png"
+        ]
+      },
+      {
+        "id": "AJ-120",
+        "name": "Classic Curb Bracelet",
+        "code": "AJ-120",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Curb Bracelet",
+        "shortDesc": "Classic curb link bracelet.",
+        "desc": "Stylish curb chain bracelet crafted in BIS 916 hallmarked yellow gold.",
+        "grossWt": 13.3,
+        "netWt": 12.8,
+        "wt": "13.3g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 96500,
+        "price": 91900,
+        "availability": "Made to Order",
+        "displayOrder": 20,
+        "tag": "",
+        "images": [
+          "images/tennis_bracelet.jpg"
+        ]
+      },
+      {
+        "id": "AJ-121",
+        "name": "Classic Rope Gold Chain",
+        "code": "AJ-121",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Rope Chain",
+        "shortDesc": "Elegant rope-style gold chain.",
+        "desc": "Beautifully crafted 22K BIS 916 hallmarked rope chain suitable for daily wear.",
+        "grossWt": 14.2,
+        "netWt": 13.8,
+        "wt": "14.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 102500,
+        "price": 97800,
+        "availability": "Made to Order",
+        "displayOrder": 21,
+        "tag": "",
+        "images": [
+          "images/pearl_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-122",
+        "name": "Box Link Gold Chain",
+        "code": "AJ-122",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Box Chain",
+        "shortDesc": "Premium box link chain.",
+        "desc": "Modern box link chain with smooth finish and premium craftsmanship.",
+        "grossWt": 12.6,
+        "netWt": 12.2,
+        "wt": "12.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 91800,
+        "price": 87400,
+        "availability": "Made to Order",
+        "displayOrder": 22,
+        "tag": "",
+        "images": [
+          "images/chain.png"
+        ]
+      },
+      {
+        "id": "AJ-123",
+        "name": "Singapore Gold Chain",
+        "code": "AJ-123",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Singapore Chain",
+        "shortDesc": "Stylish twisted chain.",
+        "desc": "Classic Singapore chain crafted from 22K yellow gold.",
+        "grossWt": 9.8,
+        "netWt": 9.4,
+        "wt": "9.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 71200,
+        "price": 67800,
+        "availability": "Made to Order",
+        "displayOrder": 23,
+        "tag": "",
+        "images": [
+          "images/pearl_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-124",
+        "name": "Flat Gold Chain",
+        "code": "AJ-124",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Flat Chain",
+        "shortDesc": "Contemporary flat chain.",
+        "desc": "Lightweight flat chain designed for everyday elegance.",
+        "grossWt": 11.3,
+        "netWt": 10.9,
+        "wt": "11.3g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 82600,
+        "price": 78900,
+        "availability": "Made to Order",
+        "displayOrder": 24,
+        "tag": "",
+        "images": [
+          "images/chain.png"
+        ]
+      },
+      {
+        "id": "AJ-125",
+        "name": "Designer Gold Chain",
+        "code": "AJ-125",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Designer Chain",
+        "shortDesc": "Luxury designer chain.",
+        "desc": "Premium handcrafted designer chain with polished finish.",
+        "grossWt": 18.5,
+        "netWt": 17.9,
+        "wt": "18.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 135000,
+        "price": 128500,
+        "availability": "Made to Order",
+        "displayOrder": 25,
+        "tag": "",
+        "images": [
+          "images/pearl_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-126",
+        "name": "Floral Gold Pendant",
+        "code": "AJ-126",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Floral Pendant",
+        "shortDesc": "Elegant floral pendant.",
+        "desc": "Beautiful floral pendant crafted in BIS 916 hallmarked yellow gold.",
+        "grossWt": 4.8,
+        "netWt": 4.5,
+        "wt": "4.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 34800,
+        "price": 32900,
+        "availability": "Made to Order",
+        "displayOrder": 26,
+        "tag": "",
+        "images": [
+          "images/ruby_pendant.jpg"
+        ]
+      },
+      {
+        "id": "AJ-127",
+        "name": "Peacock Gold Pendant",
+        "code": "AJ-127",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Temple Pendant",
+        "shortDesc": "Traditional peacock pendant.",
+        "desc": "Temple-inspired pendant featuring intricate peacock motifs.",
+        "grossWt": 6.1,
+        "netWt": 5.8,
+        "wt": "6.1g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 44500,
+        "price": 42100,
+        "availability": "Made to Order",
+        "displayOrder": 27,
+        "tag": "",
+        "images": [
+          "images/pendant.png"
+        ]
+      },
+      {
+        "id": "AJ-128",
+        "name": "Heart Gold Pendant",
+        "code": "AJ-128",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Heart Pendant",
+        "shortDesc": "Romantic heart pendant.",
+        "desc": "Minimal heart-shaped pendant suitable for everyday wear.",
+        "grossWt": 3.9,
+        "netWt": 3.6,
+        "wt": "3.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 28600,
+        "price": 26900,
+        "availability": "Made to Order",
+        "displayOrder": 28,
+        "tag": "",
+        "images": [
+          "images/ruby_pendant.jpg"
+        ]
+      },
+      {
+        "id": "AJ-129",
+        "name": "Leaf Gold Pendant",
+        "code": "AJ-129",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Nature Pendant",
+        "shortDesc": "Nature-inspired pendant.",
+        "desc": "Leaf pattern pendant with premium yellow gold finish.",
+        "grossWt": 4.5,
+        "netWt": 4.2,
+        "wt": "4.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 33200,
+        "price": 31500,
+        "availability": "Made to Order",
+        "displayOrder": 29,
+        "tag": "",
+        "images": [
+          "images/pendant.png"
+        ]
+      },
+      {
+        "id": "AJ-130",
+        "name": "Lakshmi Gold Pendant",
+        "code": "AJ-130",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Religious Pendant",
+        "shortDesc": "Sacred Lakshmi pendant.",
+        "desc": "Traditional Lakshmi pendant crafted in pure 22K yellow gold.",
+        "grossWt": 7.4,
+        "netWt": 7,
+        "wt": "7.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 53800,
+        "price": 51200,
+        "availability": "Made to Order",
+        "displayOrder": 30,
+        "tag": "",
+        "images": [
+          "images/ruby_pendant.jpg"
+        ]
+      },
+      {
+        "id": "AJ-131",
+        "name": "Classic Gold Stud Earrings",
+        "code": "AJ-131",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Stud Earrings",
+        "shortDesc": "Elegant daily wear studs.",
+        "desc": "Classic round gold stud earrings with premium polish.",
+        "grossWt": 3.8,
+        "netWt": 3.5,
+        "wt": "3.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 27600,
+        "price": 25900,
+        "availability": "Made to Order",
+        "displayOrder": 31,
+        "tag": "",
+        "images": [
+          "images/gold_jhumkas.jpg"
+        ]
+      },
+      {
+        "id": "AJ-132",
+        "name": "Drop Gold Earrings",
+        "code": "AJ-132",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Drop Earrings",
+        "shortDesc": "Elegant drop earrings.",
+        "desc": "Stylish drop earrings suitable for festive occasions.",
+        "grossWt": 5.9,
+        "netWt": 5.5,
+        "wt": "5.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 42900,
+        "price": 40600,
+        "availability": "Made to Order",
+        "displayOrder": 32,
+        "tag": "",
+        "images": [
+          "images/sapphire_earrings.jpg"
+        ]
+      },
+      {
+        "id": "AJ-133",
+        "name": "Peacock Jhumka Earrings",
+        "code": "AJ-133",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Jhumka",
+        "shortDesc": "Traditional gold jhumkas.",
+        "desc": "Intricately handcrafted peacock jhumka earrings.",
+        "grossWt": 10.8,
+        "netWt": 10.2,
+        "wt": "10.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 78500,
+        "price": 74800,
+        "availability": "Made to Order",
+        "displayOrder": 33,
+        "tag": "",
+        "images": [
+          "images/diamond_studs.jpg"
+        ]
+      },
+      {
+        "id": "AJ-134",
+        "name": "Hoop Gold Earrings",
+        "code": "AJ-134",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Hoop Earrings",
+        "shortDesc": "Modern gold hoops.",
+        "desc": "Elegant hoop earrings with a glossy yellow gold finish.",
+        "grossWt": 6.7,
+        "netWt": 6.3,
+        "wt": "6.7g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 48600,
+        "price": 46200,
+        "availability": "Made to Order",
+        "displayOrder": 34,
+        "tag": "",
+        "images": [
+          "images/earrings.png"
+        ]
+      },
+      {
+        "id": "AJ-135",
+        "name": "Floral Gold Earrings",
+        "code": "AJ-135",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Designer Earrings",
+        "shortDesc": "Designer floral earrings.",
+        "desc": "Premium floral earrings perfect for weddings and celebrations.",
+        "grossWt": 8.5,
+        "netWt": 8.1,
+        "wt": "8.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 61800,
+        "price": 58900,
+        "availability": "Made to Order",
+        "displayOrder": 35,
+        "tag": "",
+        "images": [
+          "images/gold_jhumkas.jpg"
+        ]
+      },
+      {
+        "id": "AJ-136",
+        "name": "Royal Bridal Necklace Set",
+        "code": "AJ-136",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Necklace Set",
+        "shortDesc": "Luxury bridal jewelry set.",
+        "desc": "Complete bridal necklace set handcrafted with traditional artistry.",
+        "grossWt": 72.5,
+        "netWt": 70.4,
+        "wt": "72.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 525000,
+        "price": 498000,
+        "availability": "Made to Order",
+        "displayOrder": 36,
+        "tag": "",
+        "images": [
+          "1.jpg"
+        ]
+      },
+      {
+        "id": "AJ-137",
+        "name": "Traditional Bridal Bangles",
+        "code": "AJ-137",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Bangle Set",
+        "shortDesc": "Premium bridal bangles.",
+        "desc": "Handcrafted bridal bangle set featuring classic South Indian designs.",
+        "grossWt": 45.8,
+        "netWt": 44.2,
+        "wt": "45.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 332000,
+        "price": 316000,
+        "availability": "Made to Order",
+        "displayOrder": 37,
+        "tag": "",
+        "images": [
+          "images/choker_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-138",
+        "name": "Grand Bridal Haram",
+        "code": "AJ-138",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Long Haram",
+        "shortDesc": "Traditional bridal haram.",
+        "desc": "Premium long bridal haram with intricate handcrafted work.",
+        "grossWt": 64.2,
+        "netWt": 62.1,
+        "wt": "64.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 468000,
+        "price": 446000,
+        "availability": "Made to Order",
+        "displayOrder": 38,
+        "tag": "",
+        "images": [
+          "images/necklace.png"
+        ]
+      },
+      {
+        "id": "AJ-139",
+        "name": "Designer Bridal Earrings",
+        "code": "AJ-139",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Bridal Earrings",
+        "shortDesc": "Luxury bridal earrings.",
+        "desc": "Elegant bridal earrings with premium traditional finish.",
+        "grossWt": 18.4,
+        "netWt": 17.8,
+        "wt": "18.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 134500,
+        "price": 128000,
+        "availability": "Made to Order",
+        "displayOrder": 39,
+        "tag": "",
+        "images": [
+          "1.jpg"
+        ]
+      },
+      {
+        "id": "AJ-140",
+        "name": "Royal Bridal Pendant Set",
+        "code": "AJ-140",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Pendant Set",
+        "shortDesc": "Premium bridal pendant set.",
+        "desc": "Beautiful bridal pendant set crafted in BIS 916 hallmarked yellow gold.",
+        "grossWt": 24.6,
+        "netWt": 23.8,
+        "wt": "24.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 179500,
+        "price": 171000,
+        "availability": "Made to Order",
+        "displayOrder": 40,
+        "tag": "",
+        "images": [
+          "images/choker_necklace.jpg"
+        ]
+      },
+      {
+        "id": "AJ-141",
+        "name": "Antique Lakshmi Necklace",
+        "code": "AJ-141",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Temple Necklace",
+        "shortDesc": "Traditional Lakshmi antique necklace.",
+        "desc": "Intricately handcrafted antique Lakshmi necklace made from BIS 916 hallmarked 22K yellow gold with a premium matte finish.",
+        "grossWt": 52.8,
+        "netWt": 51.2,
+        "wt": "52.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 385000,
+        "price": 368500,
+        "availability": "Made to Order",
+        "displayOrder": 41,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      },
+      {
+        "id": "AJ-142",
+        "name": "Antique Peacock Necklace",
+        "code": "AJ-142",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Designer Necklace",
+        "shortDesc": "Royal peacock antique necklace.",
+        "desc": "Elegant antique necklace featuring detailed peacock craftsmanship.",
+        "grossWt": 48.6,
+        "netWt": 47.1,
+        "wt": "48.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 352000,
+        "price": 337000,
+        "availability": "Made to Order",
+        "displayOrder": 42,
+        "tag": "",
+        "images": [
+          "images/antique.png"
+        ]
+      },
+      {
+        "id": "AJ-143",
+        "name": "Temple Antique Bangle",
+        "code": "AJ-143",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Temple Bangle",
+        "shortDesc": "Traditional temple bangle.",
+        "desc": "Premium antique temple bangle with handcrafted detailing.",
+        "grossWt": 18.5,
+        "netWt": 17.9,
+        "wt": "18.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 136500,
+        "price": 129900,
+        "availability": "Made to Order",
+        "displayOrder": 43,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      },
+      {
+        "id": "AJ-144",
+        "name": "Antique Gold Kada",
+        "code": "AJ-144",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Kada",
+        "shortDesc": "Classic antique kada.",
+        "desc": "Traditional antique kada inspired by South Indian heritage designs.",
+        "grossWt": 22.4,
+        "netWt": 21.8,
+        "wt": "22.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 165000,
+        "price": 157000,
+        "availability": "Made to Order",
+        "displayOrder": 44,
+        "tag": "",
+        "images": [
+          "images/antique.png"
+        ]
+      },
+      {
+        "id": "AJ-145",
+        "name": "Antique Jhumka Earrings",
+        "code": "AJ-145",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Jhumka",
+        "shortDesc": "Traditional antique jhumkas.",
+        "desc": "Handcrafted antique jhumka earrings with temple-inspired motifs.",
+        "grossWt": 12.6,
+        "netWt": 12,
+        "wt": "12.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 92500,
+        "price": 87900,
+        "availability": "Made to Order",
+        "displayOrder": 45,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      },
+      {
+        "id": "AJ-146",
+        "name": "Antique Lakshmi Pendant",
+        "code": "AJ-146",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Religious Pendant",
+        "shortDesc": "Lakshmi antique pendant.",
+        "desc": "Beautiful Lakshmi pendant crafted with antique gold finishing.",
+        "grossWt": 8.2,
+        "netWt": 7.8,
+        "wt": "8.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 59800,
+        "price": 56900,
+        "availability": "Made to Order",
+        "displayOrder": 46,
+        "tag": "",
+        "images": [
+          "images/antique.png"
+        ]
+      },
+      {
+        "id": "AJ-147",
+        "name": "Temple Coin Necklace",
+        "code": "AJ-147",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Coin Necklace",
+        "shortDesc": "Traditional coin necklace.",
+        "desc": "Premium antique coin necklace with heritage-inspired craftsmanship.",
+        "grossWt": 38.7,
+        "netWt": 37.5,
+        "wt": "38.7g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 282000,
+        "price": 269500,
+        "availability": "Made to Order",
+        "displayOrder": 47,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      },
+      {
+        "id": "AJ-148",
+        "name": "Vintage Floral Ring",
+        "code": "AJ-148",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Designer Ring",
+        "shortDesc": "Vintage floral ring.",
+        "desc": "Antique floral ring featuring elegant handcrafted patterns.",
+        "grossWt": 6.4,
+        "netWt": 6,
+        "wt": "6.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 46800,
+        "price": 44400,
+        "availability": "Made to Order",
+        "displayOrder": 48,
+        "tag": "",
+        "images": [
+          "images/antique.png"
+        ]
+      },
+      {
+        "id": "AJ-149",
+        "name": "Antique Gold Chain",
+        "code": "AJ-149",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Designer Chain",
+        "shortDesc": "Vintage style gold chain.",
+        "desc": "Elegant antique chain crafted with traditional South Indian patterns.",
+        "grossWt": 19.6,
+        "netWt": 18.9,
+        "wt": "19.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 143500,
+        "price": 136900,
+        "availability": "Made to Order",
+        "displayOrder": 49,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      },
+      {
+        "id": "AJ-150",
+        "name": "Royal Antique Bracelet",
+        "code": "AJ-150",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Designer Bracelet",
+        "shortDesc": "Luxury antique bracelet.",
+        "desc": "Premium handcrafted antique bracelet with timeless elegance.",
+        "grossWt": 16.8,
+        "netWt": 16.2,
+        "wt": "16.8g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 123800,
+        "price": 118000,
+        "availability": "Made to Order",
+        "displayOrder": 50,
+        "tag": "",
+        "images": [
+          "images/antique.png"
+        ]
+      },
+      {
+        "id": "AJ-151",
+        "name": "Classic Gold Wedding Ring",
+        "code": "AJ-151",
+        "category": "rings",
+        "cat": "rings",
+        "subCategory": "Wedding Ring",
+        "shortDesc": "Elegant wedding band.",
+        "desc": "Simple yet premium wedding ring crafted in 22K yellow gold.",
+        "grossWt": 5.2,
+        "netWt": 4.9,
+        "wt": "5.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 38600,
+        "price": 36500,
+        "availability": "Made to Order",
+        "displayOrder": 51,
+        "tag": "",
+        "images": [
+          "images/emerald_cut_ring.jpg"
+        ]
+      },
+      {
+        "id": "AJ-152",
+        "name": "Designer Gold Pendant",
+        "code": "AJ-152",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Designer Pendant",
+        "shortDesc": "Modern designer pendant.",
+        "desc": "Premium designer pendant suitable for everyday elegance.",
+        "grossWt": 5.6,
+        "netWt": 5.2,
+        "wt": "5.6g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 40900,
+        "price": 38800,
+        "availability": "Made to Order",
+        "displayOrder": 52,
+        "tag": "",
+        "images": [
+          "images/pendant.png"
+        ]
+      },
+      {
+        "id": "AJ-153",
+        "name": "Luxury Bridal Necklace",
+        "code": "AJ-153",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Premium Necklace",
+        "shortDesc": "Exclusive bridal necklace.",
+        "desc": "Luxury bridal necklace with intricate handcrafted temple motifs.",
+        "grossWt": 68.9,
+        "netWt": 66.8,
+        "wt": "68.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 499000,
+        "price": 475000,
+        "availability": "Made to Order",
+        "displayOrder": 53,
+        "tag": "",
+        "images": [
+          "images/necklace.png"
+        ]
+      },
+      {
+        "id": "AJ-154",
+        "name": "Elegant Gold Bracelet",
+        "code": "AJ-154",
+        "category": "bracelets",
+        "cat": "bracelets",
+        "subCategory": "Daily Wear Bracelet",
+        "shortDesc": "Minimal daily bracelet.",
+        "desc": "Lightweight bracelet designed for everyday comfort and elegance.",
+        "grossWt": 8.9,
+        "netWt": 8.5,
+        "wt": "8.9g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 64800,
+        "price": 61800,
+        "availability": "Made to Order",
+        "displayOrder": 54,
+        "tag": "",
+        "images": [
+          "images/bracelet.png"
+        ]
+      },
+      {
+        "id": "AJ-155",
+        "name": "Premium Gold Chain",
+        "code": "AJ-155",
+        "category": "chains",
+        "cat": "chains",
+        "subCategory": "Premium Chain",
+        "shortDesc": "Premium everyday chain.",
+        "desc": "Elegant premium chain crafted in BIS 916 hallmarked yellow gold.",
+        "grossWt": 17.2,
+        "netWt": 16.6,
+        "wt": "17.2g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 126500,
+        "price": 120000,
+        "availability": "Made to Order",
+        "displayOrder": 55,
+        "tag": "",
+        "images": [
+          "images/chain.png"
+        ]
+      },
+      {
+        "id": "AJ-156",
+        "name": "Temple Gold Earrings",
+        "code": "AJ-156",
+        "category": "earrings",
+        "cat": "earrings",
+        "subCategory": "Temple Earrings",
+        "shortDesc": "Traditional temple earrings.",
+        "desc": "Temple-inspired earrings with intricate handcrafted detailing.",
+        "grossWt": 9.4,
+        "netWt": 9,
+        "wt": "9.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 68600,
+        "price": 65200,
+        "availability": "Made to Order",
+        "displayOrder": 56,
+        "tag": "",
+        "images": [
+          "images/sapphire_earrings.jpg"
+        ]
+      },
+      {
+        "id": "AJ-157",
+        "name": "Classic Casting Bangle",
+        "code": "AJ-157",
+        "category": "bangles",
+        "cat": "bangles",
+        "subCategory": "Casting Bangle",
+        "shortDesc": "Elegant casting bangle.",
+        "desc": "Premium casting bangle with a smooth polished yellow gold finish.",
+        "grossWt": 13.5,
+        "netWt": 13,
+        "wt": "13.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 98500,
+        "price": 93900,
+        "availability": "Made to Order",
+        "displayOrder": 57,
+        "tag": "",
+        "images": [
+          "images/bangle.png"
+        ]
+      },
+      {
+        "id": "AJ-158",
+        "name": "Royal Temple Pendant",
+        "code": "AJ-158",
+        "category": "pendants",
+        "cat": "pendants",
+        "subCategory": "Temple Pendant",
+        "shortDesc": "Royal temple pendant.",
+        "desc": "Premium temple pendant with exquisite handcrafted detailing.",
+        "grossWt": 7.1,
+        "netWt": 6.7,
+        "wt": "7.1g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 51800,
+        "price": 49200,
+        "availability": "Made to Order",
+        "displayOrder": 58,
+        "tag": "",
+        "images": [
+          "images/ruby_pendant.jpg"
+        ]
+      },
+      {
+        "id": "AJ-159",
+        "name": "Traditional Bridal Bangle Set",
+        "code": "AJ-159",
+        "category": "bridal",
+        "cat": "bridal",
+        "subCategory": "Bridal Bangles",
+        "shortDesc": "Luxury bridal bangle set.",
+        "desc": "Exclusive bridal bangle set crafted with intricate traditional patterns.",
+        "grossWt": 42.5,
+        "netWt": 41,
+        "wt": "42.5g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 309000,
+        "price": 294500,
+        "availability": "Made to Order",
+        "displayOrder": 59,
+        "tag": "",
+        "images": [
+          "1.jpg"
+        ]
+      },
+      {
+        "id": "AJ-160",
+        "name": "Heritage Antique Necklace",
+        "code": "AJ-160",
+        "category": "antique",
+        "cat": "antique",
+        "subCategory": "Heritage Collection",
+        "shortDesc": "Premium heritage necklace.",
+        "desc": "Exclusive heritage antique necklace crafted with timeless South Indian artistry and BIS 916 hallmarked 22K yellow gold.",
+        "grossWt": 56.4,
+        "netWt": 54.8,
+        "wt": "56.4g",
+        "purity": "22K/916",
+        "metal": "Yellow Gold",
+        "color": "Yellow",
+        "hallmark": "BIS 916 Hallmarked",
+        "mrp": 412000,
+        "price": 394000,
+        "availability": "Made to Order",
+        "displayOrder": 60,
+        "tag": "",
+        "images": [
+          "3.webp"
+        ]
+      }
+    ];
+
+    let PRODUCTS = [...INITIAL_PRODUCTS];
+
+
+    function tryInitFirebase(config) {
+      try {
+        const cfg = config || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
+        if (!cfg || !cfg.apiKey || cfg.apiKey.includes('DUMMY') || cfg.apiKey.includes('YOUR_')) throw new Error('No valid config');
+        if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+          if (!firebase.apps.length) firebase.initializeApp(cfg);
+          else firebase.app();
+          db = firebase.firestore();
+          try { auth = firebase.auth(); } catch (e) { }
+          FIREBASE_READY = true;
+          console.log("🔥 Admin connected to Firestore & Firebase Auth!");
+          listenToFirestoreData();
+        }
+      } catch (err) {
+        console.warn("Firebase Init Notice:", err.message);
+        FIREBASE_READY = false;
+      }
+      updateModeUI();
+    }
+
+    function updateModeUI() {
+      const pill = $('#modeText'), banner = $('#demoBanner');
+      if (FIREBASE_READY) {
+        if (pill) pill.textContent = 'Firebase connected — live Firestore sync active';
+        if (banner) banner.classList.add('hide');
+      } else {
+        if (pill) pill.textContent = 'No Firebase config found — running in Demo Mode';
+        if (banner) banner.classList.remove('hide');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        tryInitFirebase(null);
+        setupAuthListener();
+      });
+    } else {
+      tryInitFirebase(null);
+      setupAuthListener();
+    }
+
+    function listenToFirestoreData() {
+      if (!FIREBASE_READY || !db) return;
+
+      // Subscribe to real-time Gold & Silver Rates
+      initAdminRates();
+
+      // Real-time listener for Firestore Products
+      db.collection('products').onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          // Seed initial products to Firestore if collection is empty
+          const batch = db.batch();
+          INITIAL_PRODUCTS.forEach(p => {
+            const ref = db.collection('products').doc(String(p.id));
+            batch.set(ref, {
+              ...p,
+              cat: p.cat || p.category || 'rings',
+              category: p.category || p.cat || 'rings',
+              createdAt: p.createdAt || new Date().toISOString()
+            }, { merge: true });
+          });
+          batch.commit().catch(e => console.warn("Seeding notice:", e));
+        } else {
+          const liveProds = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            liveProds.push({
+              id: doc.id,
+              ...data,
+              // Normalize Firestore Timestamp to ISO string for consistent handling
+              createdAt: data.createdAt && typeof data.createdAt === 'object' && data.createdAt.toDate
+                ? data.createdAt.toDate().toISOString()
+                : (data.createdAt || new Date().toISOString()),
+              updatedAt: data.updatedAt && typeof data.updatedAt === 'object' && data.updatedAt.toDate
+                ? data.updatedAt.toDate().toISOString()
+                : (data.updatedAt || '')
+            });
+          });
+          PRODUCTS = liveProds;
+          persistProducts();
+          renderAll();
+        }
+      }, err => console.warn("Firestore sync notice:", err));
+    }
+
+    /* ---------- Icon set (reused as product thumbnails when no image uploaded) ---------- */
+    const ICONS = {
+      rings: `<svg viewBox="0 0 100 100"><circle cx="50" cy="62" r="26" fill="none" stroke="#A9812A" stroke-width="6"/><path d="M50 36 40 20h20z" fill="#D4AF37"/></svg>`,
+      necklace: `<svg viewBox="0 0 100 100"><path d="M20 20Q50 65 80 20" fill="none" stroke="#A9812A" stroke-width="4"/><circle cx="50" cy="68" r="10" fill="#D4AF37"/></svg>`,
+      earrings: `<svg viewBox="0 0 100 100"><circle cx="50" cy="24" r="8" fill="none" stroke="#A9812A" stroke-width="4"/><path d="M50 32Q35 55 50 78Q65 55 50 32" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      bangles: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="none" stroke="#A9812A" stroke-width="10"/></svg>`,
+      bracelets: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="36" ry="18" fill="none" stroke="#A9812A" stroke-width="6"/></svg>`,
+      chains: `<svg viewBox="0 0 100 100"><g fill="none" stroke="#A9812A" stroke-width="5"><ellipse cx="35" cy="30" rx="10" ry="14" transform="rotate(20 35 30)"/><ellipse cx="55" cy="45" rx="10" ry="14" transform="rotate(-20 55 45)"/><ellipse cx="40" cy="62" rx="10" ry="14" transform="rotate(20 40 62)"/></g></svg>`,
+      pendants: `<svg viewBox="0 0 100 100"><circle cx="50" cy="22" r="6" fill="none" stroke="#A9812A" stroke-width="4"/><path d="M50 46 68 74 32 74Z" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      haram: `<svg viewBox="0 0 100 100"><path d="M12 16Q50 78 88 16" fill="none" stroke="#A9812A" stroke-width="3"/><circle cx="50" cy="70" r="9" fill="#D4AF37"/></svg>`,
+      antique: `<svg viewBox="0 0 100 100"><path d="M50 15c-18 0-30 13-30 30 0 22 30 40 30 40s30-18 30-40c0-17-12-30-30-30Z" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      sets: `<svg viewBox="0 0 100 100"><circle cx="50" cy="22" r="6" fill="none" stroke="#A9812A" stroke-width="4"/><path d="M50 46 68 74 32 74Z" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      "casting-ring": `<svg viewBox="0 0 100 100"><circle cx="50" cy="62" r="26" fill="none" stroke="#A9812A" stroke-width="6"/><path d="M50 36 40 20 h20 z" fill="#D4AF37"/></svg>`,
+      "casting-earrings": `<svg viewBox="0 0 100 100"><circle cx="50" cy="24" r="8" fill="none" stroke="#A9812A" stroke-width="4"/><path d="M50 32Q35 55 50 78Q65 55 50 32" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      "casting-pendant": `<svg viewBox="0 0 100 100"><circle cx="50" cy="22" r="6" fill="none" stroke="#A9812A" stroke-width="4"/><path d="M50 46 68 74 32 74Z" fill="none" stroke="#A9812A" stroke-width="4"/></svg>`,
+      "casting-necklace": `<svg viewBox="0 0 100 100"><path d="M20 20Q50 65 80 20" fill="none" stroke="#A9812A" stroke-width="4"/><circle cx="50" cy="68" r="10" fill="#D4AF37"/></svg>`
+    };
+    function iconFor(cat) { return ICONS[cat] || ICONS.rings; }
+
+    /* ---------- Seed data (in-memory "Firestore") ---------- */
+    let CATEGORIES = [
+      { id: 1, name: "Rings", slug: "rings", order: 1 },
+      { id: 2, name: "Necklace", slug: "necklace", order: 2 },
+      { id: 3, name: "Earrings", slug: "earrings", order: 3 },
+      { id: 4, name: "Chains", slug: "chains", order: 4 },
+      { id: 5, name: "Bangles", slug: "bangles", order: 5 },
+      { id: 6, name: "Bracelets", slug: "bracelets", order: 6 },
+      { id: 7, name: "Pendants", slug: "pendants", order: 7 },
+      { id: 8, name: "Haram", slug: "haram", order: 8 },
+      { id: 9, name: "Antique", slug: "antique", order: 9 },
+      { id: 10, name: "Combo Sets", slug: "sets", order: 10 },
+      { id: 11, name: "Casting Ring", slug: "casting-ring", order: 11 },
+      { id: 12, name: "Casting Earrings", slug: "casting-earrings", order: 12 },
+      { id: 13, name: "Casting Pendant", slug: "casting-pendant", order: 13 },
+      { id: 14, name: "Casting Necklace", slug: "casting-necklace", order: 14 }
+    ];
+
+
+
+
+    let REVIEWS = [
+      { id: 1, customer: "Revathi S.", productId: 3, rating: 5, comment: "Beautiful finish and perfect fit — hallmark certificate gave total peace of mind.", verified: true, status: "approved" },
+      { id: 2, customer: "Karthik M.", productId: 1, rating: 5, comment: "Transparent pricing on WhatsApp before I paid. Very smooth experience.", verified: true, status: "approved" },
+      { id: 3, customer: "Divya R.", productId: 8, rating: 4, comment: "More detailed in person than in photos. Exchange offer saved us a lot.", verified: false, status: "pending" },
+      { id: 4, customer: "Arjun P.", productId: 5, rating: 5, comment: "Third generation customer, love the new online catalogue.", verified: true, status: "pending" }
+    ];
+
+    let nextProdId = 11, nextCatId = 11, editingProductId = null, editingCategoryId = null, pendingImages = [];
+
+    /* ---------- Login ---------- */
+    function showLoginError(msg) {
+      const el = $('#loginError');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('show');
+      // Force reflow for re-triggering animation
+      void el.offsetWidth;
+      el.classList.add('show');
+    }
+    function hideLoginError() {
+      const el = $('#loginError');
+      if (el) { el.classList.remove('show'); el.textContent = ''; }
+    }
+    function getAuthErrorMessage(code) {
+      const map = {
+        'auth/invalid-email': 'Invalid email address format.',
+        'auth/user-disabled': 'This account has been disabled.',
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password. Please try again.',
+        'auth/invalid-credential': 'Invalid email or password.',
+        'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+        'auth/network-request-failed': 'Network error. Please check your connection.',
+        'auth/internal-error': 'An internal error occurred. Please try again.',
+        'auth/missing-password': 'Please enter your password.'
+      };
+      return map[code] || 'Authentication failed. Please try again.';
+    }
+
+    async function handleLogin() {
+      const emailInput = $('#loginEmail');
+      const passInput = $('#loginPassword');
+      const btn = $('#loginBtn');
+
+      const email = emailInput ? emailInput.value.trim() : '';
+      const pass = passInput ? passInput.value : '';
+
+      hideLoginError();
+
+      // Client-side validation
+      if (!email) {
+        showLoginError('Please enter your email address.');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+      if (!pass) {
+        showLoginError('Please enter your password.');
+        if (passInput) passInput.focus();
+        return;
+      }
+
+      // Firebase must be ready
+      if (!FIREBASE_READY || !auth) {
+        showLoginError('Firebase is not connected. Please configure Firebase to access the Admin Dashboard.');
+        return;
+      }
+
+      // Disable button during auth
+      if (btn) { btn.textContent = 'Signing in…'; btn.disabled = true; }
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, pass);
+        console.log('🔥 Logged in via Firebase Auth:', userCredential.user.email);
+        // enterApp() will be called by onAuthStateChanged listener
+      } catch (err) {
+        console.warn('Firebase Auth Error:', err.code, err.message);
+        showLoginError(getAuthErrorMessage(err.code));
+        if (btn) { btn.textContent = 'Sign In to Dashboard'; btn.disabled = false; }
+        // Do NOT call enterApp() — stay on login screen
+      }
+    }
+
+    function enterApp(user) {
+      const email = (user && user.email) ? user.email : 'Admin';
+      try {
+        const namePart = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        $('#userNameLbl').textContent = namePart || 'Admin';
+        $('#userAvatar').textContent = email.charAt(0).toUpperCase();
+      } catch (e) { }
+
+      const loginScr = $('#loginScreen');
+      const adminShell = $('#adminApp');
+      if (loginScr) loginScr.classList.add('hide');
+      if (adminShell) adminShell.classList.remove('hide');
+
+      // Reset login button state
+      const btn = $('#loginBtn');
+      if (btn) { btn.textContent = 'Sign In to Dashboard'; btn.disabled = false; }
+      hideLoginError();
+
+      try {
+        renderAll();
+      } catch (err) {
+        console.error('renderAll notice:', err);
+      }
+    }
+
+    function showLoginScreen() {
+      const loginScr = $('#loginScreen');
+      const adminShell = $('#adminApp');
+      if (adminShell) adminShell.classList.add('hide');
+      if (loginScr) loginScr.classList.remove('hide');
+      const passInput = $('#loginPassword');
+      if (passInput) passInput.value = '';
+      hideLoginError();
+    }
+
+    async function handleLogout() {
+      try {
+        if (auth) await auth.signOut();
+        console.log('🔥 Firebase Auth: Signed out successfully.');
+      } catch (err) {
+        console.warn('Sign out error:', err);
+      }
+      // Clear app data from localStorage
+      try {
+        localStorage.removeItem('MM_PRODUCTS');
+      } catch (e) { }
+      // onAuthStateChanged will handle showing login screen
+      showLoginScreen();
+    }
+
+    // Firebase Auth state listener — single source of truth
+    function setupAuthListener() {
+      if (!auth) return;
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          console.log('🔥 Auth state: User is signed in —', user.email);
+          enterApp(user);
+        } else {
+          console.log('🔥 Auth state: No user signed in.');
+          showLoginScreen();
+        }
+      });
+    }
+
+    /* ---------- Sidebar nav ---------- */
+    $$('.side-link').forEach(btn => btn.addEventListener('click', () => {
+      showView(btn.dataset.view);
+      if (window.innerWidth <= 900) toggleSidebar(false);
+    }));
+    function showView(name) {
+      $$('.side-link').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+      $$('.view').forEach(v => v.classList.remove('active'));
+      const targetView = $('#view-' + name);
+      if (targetView) targetView.classList.add('active');
+      const titles = { dashboard: 'Dashboard', products: 'Product Management', categories: 'Category Management', reviews: 'Customer Reviews', analytics: 'Analytics', reports: 'Import / Export', rates: 'Daily Gold & Silver Rates', settings: 'Settings' };
+      $('#viewTitle').textContent = titles[name] || 'Dashboard';
+      if (name === 'products') renderProducts();
+      if (name === 'dashboard') renderDashboard();
+      if (name === 'categories') renderCategories();
+    }
+    function toggleSidebar(open) {
+      $('#sidebar').classList.toggle('show', open);
+      $('#sidebarOverlay').classList.toggle('show', open);
+    }
+
+    /* ---------- Toast ---------- */
+    function showToast(msg) {
+      const t = $('#toast'); $('#toastMsg').textContent = msg;
+      t.classList.add('show'); clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function getProductImageUrl(p) {
+      if (!p) return null;
+      if (Array.isArray(p.images) && p.images.length > 0 && p.images[0]) return p.images[0];
+      if (typeof p.images === 'string' && p.images.trim()) return p.images.trim();
+      if (typeof p.img === 'string' && p.img.trim()) return p.img.trim();
+      if (typeof p.image === 'string' && p.image.trim()) return p.image.trim();
+      return null;
+    }
+
+    function getProductTimestamp(p) {
+      if (!p) return 0;
+      if (p.createdAt) {
+        // Handle Firestore Timestamp objects
+        if (typeof p.createdAt === 'object' && typeof p.createdAt.toDate === 'function') {
+          return p.createdAt.toDate().getTime();
+        }
+        // Handle Firestore Timestamp-like objects {seconds, nanoseconds}
+        if (typeof p.createdAt === 'object' && p.createdAt.seconds) {
+          return p.createdAt.seconds * 1000;
+        }
+        const t = new Date(p.createdAt).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+      if (p.updatedAt) {
+        if (typeof p.updatedAt === 'object' && typeof p.updatedAt.toDate === 'function') {
+          return p.updatedAt.toDate().getTime();
+        }
+        if (typeof p.updatedAt === 'object' && p.updatedAt.seconds) {
+          return p.updatedAt.seconds * 1000;
+        }
+        const t = new Date(p.updatedAt).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+      if (typeof p.id === 'number') return p.id;
+      if (typeof p.id === 'string') {
+        if (p.id.startsWith('prod-')) {
+          const num = parseInt(p.id.replace('prod-', ''));
+          if (!isNaN(num)) return num;
+        }
+        const num = parseInt(p.id.replace(/\D/g, ''));
+        if (!isNaN(num) && num > 0) return num;
+      }
+      return 0;
+    }
+
+    function prodThumbHtml(p) {
+      const imgUrl = getProductImageUrl(p);
+      return imgUrl ? `<img src="${imgUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='logo.png';">` : iconFor(p.category || p.cat);
+    }
+
+    /* ============================================================
+       RENDER: DASHBOARD
+       ============================================================ */
+    function renderDashboard() {
+      const kpiTotal = $('#kpiTotalProducts');
+      if (kpiTotal) kpiTotal.textContent = PRODUCTS.length;
+      const kpiReviews = $('#kpiReviews');
+      if (kpiReviews) kpiReviews.textContent = REVIEWS.filter(r => r.status === 'pending').length;
+
+      // Recent table
+      const recentTable = $('#dashRecentTable');
+      if (recentTable) {
+        const recent = [...PRODUCTS].sort((a, b) => getProductTimestamp(b) - getProductTimestamp(a)).slice(0, 5);
+        recentTable.innerHTML = recent.map(p => `
+      <tr>
+        <td><div class="row-prod"><div class="row-thumb">${prodThumbHtml(p)}</div><div><b>${p.name}</b><span>${p.code}</span></div></div></td>
+        <td style="text-transform:capitalize;">${p.category}</td>
+        <td>${rupee(p.price)}</td>
+        <td>${statusPill(p)}</td>
+      </tr>`).join('');
+      }
+
+      // nav badges
+      const navProd = $('#navProdCount');
+      if (navProd) navProd.textContent = PRODUCTS.length;
+      const navReview = $('#navReviewCount');
+      if (navReview) navReview.textContent = REVIEWS.filter(r => r.status === 'pending').length;
+    }
+    function statusPill(p) {
+      return `<span class="pill ok">Made to Order</span>`;
+    }
+
+    /* ============================================================
+       RENDER: PRODUCTS
+       ============================================================ */
+    function populateCategorySelects() {
+      const opts = `<option value="all">All Categories</option>` + CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+      $('#prodCatFilter').innerHTML = opts;
+      $('#fCategory').innerHTML = CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+    }
+    function renderProducts() {
+      const term = ($('#prodSearch').value || '').toLowerCase();
+      const catF = $('#prodCatFilter').value || 'all';
+      let list = PRODUCTS.filter(p => {
+        const matchesTerm = !term || (p.name + p.code + p.category).toLowerCase().includes(term);
+        const matchesCat = catF === 'all' || p.category === catF;
+        return matchesTerm && matchesCat;
+      });
+      const tbody = $('#productsTable');
+      if (!list.length) { tbody.innerHTML = `<tr class="empty-row"><td colspan="9">No products found.</td></tr>`; return; }
+      tbody.innerHTML = list.map((p, idx) => {
+        const isVis = p.isVisible !== false;
+        const visPill = isVis
+          ? `<span class="pill ok" style="background:rgba(44,122,75,.12); color:#2c7a4b; cursor:pointer;" onclick="toggleVisibility('${p.id}', false)" title="Click to hide from website">Visible</span>`
+          : `<span class="pill danger" style="background:rgba(217,83,79,.12); color:#d9534f; cursor:pointer;" onclick="toggleVisibility('${p.id}', true)" title="Click to show on website">Hidden</span>`;
+        const vaVal = p.va || p.valueAddition || '—';
+        return `
+    <tr>
+      <td style="text-align:center; font-weight:600; color:var(--ink-soft);">${idx + 1}</td>
+      <td><div class="row-prod"><div class="row-thumb">${prodThumbHtml(p)}</div><div><b>${p.name}</b><span>${p.code}</span></div></div></td>
+      <td style="text-transform:capitalize;">${p.category}</td>
+      <td><span style="font-weight:600; color:var(--maroon);">${vaVal}</span></td>
+      <td>${p.purity}</td>
+      <td>${rupee(p.price)} <span style="color:#999; text-decoration:line-through; font-size:11px;">${rupee(p.mrp)}</span></td>
+      <td>${visPill}</td>
+      <td>${statusPill(p)}</td>
+      <td><div class="row-actions">
+        <button class="icon-mini" onclick="openAdminProdDetailsModal('${p.id}')" aria-label="View Details" title="View Details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg></button>
+        <button class="icon-mini" onclick="openProductModal('${p.id}')" aria-label="Edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="icon-mini del" onclick="confirmDeleteProduct('${p.id}')" aria-label="Delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></button>
+      </div></td>
+    </tr>`;
+      }).join('');
+    }
+    function toggleVisibility(id, setVisible) {
+      const p = PRODUCTS.find(x => String(x.id) === String(id));
+      if (!p) return;
+      p.isVisible = setVisible;
+      if (FIREBASE_READY && db) {
+        db.collection('products').doc(String(id)).set({ isVisible: setVisible, updatedAt: new Date().toISOString() }, { merge: true }).catch(e => console.warn(e));
+      } else {
+        persistProducts();
+        renderAll();
+      }
+      showToast(setVisible ? 'Product is now Visible on website' : 'Product is now Hidden from website');
+    }
+    $('#prodSearch').addEventListener('input', renderProducts);
+    $('#prodCatFilter').addEventListener('change', renderProducts);
+
+    /* ---------- Product modal ---------- */
+    function openProductModal(id) {
+      editingProductId = id ? String(id) : null;
+      pendingImages = [];
+      $('#imgPreviewRow').innerHTML = '';
+      $('#compressNote').textContent = '';
+      if (id) {
+        const targetId = String(id);
+        const p = PRODUCTS.find(x => String(x.id) === targetId || String(x.code) === targetId);
+        if (!p) {
+          console.warn("Product not found:", id);
+          showToast("Could not find product details");
+          return;
+        }
+        $('#prodModalTitle').textContent = 'Edit Product';
+        $('#fName').value = p.name || '';
+        $('#fCode').value = p.code || '';
+        $('#fCategory').value = p.category || p.cat || 'rings';
+        $('#fSubCategory').value = p.subCategory || '';
+        if ($('#fVa')) $('#fVa').value = p.va || p.valueAddition || '';
+        $('#fShortDesc').value = p.shortDesc || '';
+        $('#fDesc').value = p.desc || p.description || '';
+        $('#fGrossWt').value = p.grossWt !== undefined && p.grossWt !== null ? p.grossWt : '';
+        $('#fNetWt').value = p.netWt !== undefined && p.netWt !== null ? p.netWt : '';
+        $('#fPurity').value = p.purity || '22K/916';
+        $('#fMetal').value = p.metal || 'Yellow Gold';
+        $('#fColor').value = p.color || '';
+        $('#fHallmark').value = p.hallmark || 'BIS 916 Hallmarked';
+        $('#fMrp').value = p.mrp || '';
+        $('#fPrice').value = p.price || '';
+        $('#fAvailability').value = 'Made to Order';
+        $('#fDisplayOrder').value = p.displayOrder || 1;
+        $('#fWhatsapp').value = p.whatsapp || '+91 99426 76753';
+        if ($('#fIsVisible')) $('#fIsVisible').checked = p.isVisible !== false;
+
+        if (Array.isArray(p.images) && p.images.length) {
+          pendingImages = [...p.images];
+        } else if (p.images && typeof p.images === 'string') {
+          pendingImages = [p.images];
+        } else if (p.img) {
+          pendingImages = [p.img];
+        } else if (p.image) {
+          pendingImages = [p.image];
+        } else {
+          pendingImages = [];
+        }
+        renderImgPreviews();
+      } else {
+        $('#prodModalTitle').textContent = 'Add Product';
+        ['fName', 'fCode', 'fSubCategory', 'fVa', 'fShortDesc', 'fDesc', 'fGrossWt', 'fNetWt', 'fColor', 'fMrp', 'fPrice', 'fDisplayOrder'].forEach(k => {
+          const el = $('#' + k);
+          if (el) el.value = '';
+        });
+        $('#fWhatsapp').value = '+91 99426 76753';
+        $('#fAvailability').value = 'Made to Order';
+        $('#fCategory').value = (CATEGORIES && CATEGORIES.length) ? CATEGORIES[0].slug : 'rings';
+        if ($('#fIsVisible')) $('#fIsVisible').checked = true;
+      }
+      $('#prodModalOverlay').classList.add('show');
+      $('#prodModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeProductModal() {
+      $('#prodModalOverlay').classList.remove('show');
+      $('#prodModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    /* ---------- Drag & drop + image compression ---------- */
+    const dropZone = $('#prodDropZone');
+    ['dragover', 'dragleave', 'drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        if (evt === 'dragover') dropZone.classList.add('drag');
+        if (evt === 'dragleave' || evt === 'drop') dropZone.classList.remove('drag');
+        if (evt === 'drop' && e.dataTransfer.files.length) processImageFiles(e.dataTransfer.files);
+      });
+    });
+    function handleProductImages(e) { if (e.target.files.length) processImageFiles(e.target.files); e.target.value = ''; }
+    function processImageFiles(fileList) {
+      const files = [...fileList].filter(f => f.type.startsWith('image/'));
+      if (!files.length) return;
+      $('#compressNote').textContent = 'Compressing images…';
+      let done = 0;
+      files.forEach(file => {
+        compressImage(file, 640, 0.72).then(dataUrl => {
+          pendingImages.push(dataUrl);
+          done++;
+          if (done === files.length) {
+            renderImgPreviews();
+            $('#compressNote').textContent = `${files.length} image(s) compressed & stored as base64 for Firestore.`;
+          }
+        });
+      });
+    }
+    function compressImage(file, maxWidth, quality) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxWidth / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale; canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    function renderImgPreviews() {
+      $('#imgPreviewRow').innerHTML = pendingImages.map((src, i) => `
+    <div class="img-preview"><img src="${src}"><button onclick="removePendingImage(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join('');
+    }
+    function removePendingImage(i) { pendingImages.splice(i, 1); renderImgPreviews(); }
+
+    async function saveProduct() {
+      const nameInput = $('#fName');
+      const codeInput = $('#fCode');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const code = codeInput ? codeInput.value.trim() : '';
+      const rawPrice = $('#fPrice') && $('#fPrice').value !== '' ? parseFloat($('#fPrice').value) : 0;
+      const price = isNaN(rawPrice) || rawPrice < 0 ? 0 : rawPrice;
+      const rawMrp = $('#fMrp') && $('#fMrp').value !== '' ? parseFloat($('#fMrp').value) : 0;
+      const mrp = isNaN(rawMrp) || rawMrp < 0 ? 0 : rawMrp;
+
+      if (!name) {
+        showToast('Please enter a Product Name');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+      if (!code) {
+        showToast('Please enter a Product Code');
+        if (codeInput) codeInput.focus();
+        return;
+      }
+
+      const category = $('#fCategory') ? $('#fCategory').value || 'rings' : 'rings';
+      const grossWt = $('#fGrossWt') ? (parseFloat($('#fGrossWt').value) || 0) : 0;
+      const data = {
+        name: name,
+        code: code,
+        cat: category,
+        category: category,
+        subCategory: $('#fSubCategory') ? $('#fSubCategory').value.trim() : '',
+        va: $('#fVa') ? $('#fVa').value.trim() : '',
+        valueAddition: $('#fVa') ? $('#fVa').value.trim() : '',
+        shortDesc: $('#fShortDesc') ? $('#fShortDesc').value.trim() : '',
+        desc: $('#fDesc') ? $('#fDesc').value.trim() : '',
+        grossWt: grossWt,
+        netWt: $('#fNetWt') ? (parseFloat($('#fNetWt').value) || 0) : 0,
+        wt: grossWt > 0 ? `${grossWt}g` : '0g',
+        purity: $('#fPurity') ? $('#fPurity').value : '22K/916',
+        metal: $('#fMetal') ? $('#fMetal').value : 'Yellow Gold',
+        color: $('#fColor') ? $('#fColor').value.trim() : 'Yellow',
+        hallmark: $('#fHallmark') ? $('#fHallmark').value : 'BIS 916 Hallmarked',
+        mrp: mrp,
+        price: price,
+        availability: 'Made to Order',
+        isVisible: $('#fIsVisible') ? $('#fIsVisible').checked : true,
+        displayOrder: $('#fDisplayOrder') ? (parseInt($('#fDisplayOrder').value) || 1) : 1,
+        whatsapp: $('#fWhatsapp') ? $('#fWhatsapp').value.trim() : '+91 99426 76753',
+        images: [...pendingImages]
+      };
+
+      const idStr = editingProductId ? String(editingProductId) : null;
+      const existingProd = editingProductId ? PRODUCTS.find(p => String(p.id) === idStr || String(p.code) === idStr) : null;
+      const docId = idStr || ((FIREBASE_READY && db) ? db.collection('products').doc().id : ('prod-' + Date.now()));
+
+      const finalProd = {
+        id: docId,
+        ...data,
+        createdAt: existingProd && existingProd.createdAt ? existingProd.createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (FIREBASE_READY && db) {
+        try {
+          await db.collection('products').doc(docId).set(finalProd, { merge: true });
+          console.log("🔥 [Firestore API] Product saved with ID:", docId);
+          // onSnapshot listener will automatically update PRODUCTS and re-render
+        } catch (err) {
+          console.error("🔥 [Firestore Save Error]:", err);
+          showToast("Error saving to Firestore: " + (err.message || err));
+          return;
+        }
+      } else {
+        // Demo mode: update in-memory directly
+        const idx = PRODUCTS.findIndex(p => String(p.id) === String(docId) || (idStr && String(p.id) === idStr));
+        if (idx !== -1) {
+          PRODUCTS[idx] = finalProd;
+        } else {
+          PRODUCTS.unshift(finalProd);
+        }
+        persistProducts();
+        renderAll();
+      }
+
+      closeProductModal();
+      showToast(editingProductId ? 'Product updated successfully' : 'Product saved successfully');
+    }
+
+    function confirmDeleteProduct(id) {
+      if (!id) return;
+      const targetId = String(id);
+      const p = PRODUCTS.find(x => String(x.id) === targetId || String(x.code) === targetId);
+      const name = p ? p.name : targetId;
+
+      openConfirm(`Are you sure you want to delete "${name}"?`, async () => {
+        if (FIREBASE_READY && db) {
+          try {
+            await db.collection('products').doc(targetId).delete();
+            console.log("🔥 [Firestore API] Product deleted with ID:", targetId);
+            // onSnapshot listener will automatically update PRODUCTS and re-render
+            showToast('Product deleted successfully');
+          } catch (err) {
+            console.error("🔥 [Firestore Delete Error]:", err);
+            showToast("Error deleting from Firestore: " + (err.message || err));
+          }
+        } else {
+          // Demo mode: update in-memory directly
+          PRODUCTS = PRODUCTS.filter(p => String(p.id) !== targetId && String(p.code) !== targetId);
+          persistProducts();
+          renderAll();
+          showToast('Product deleted successfully');
+        }
+      });
+    }
+    function persistProducts() {
+      try {
+        localStorage.setItem('MM_PRODUCTS', JSON.stringify(PRODUCTS));
+      } catch (e) { }
+    }
+
+    /* ============================================================
+       CATEGORIES
+       ============================================================ */
+    function renderCategories() {
+      const term = ($('#catSearch').value || '').toLowerCase();
+      const list = CATEGORIES.filter(c => !term || c.name.toLowerCase().includes(term));
+      $('#categoriesTable').innerHTML = list.sort((a, b) => a.order - b.order).map(c => {
+        const count = PRODUCTS.filter(p => p.category === c.slug).length;
+        return `<tr>
+      <td><b style="font-family:var(--font-sub); color:var(--maroon);">${c.name}</b></td>
+      <td style="color:var(--ink-soft);">${c.slug}</td>
+      <td>${count}</td>
+      <td>${c.order}</td>
+      <td><div class="row-actions">
+        <button class="icon-mini" onclick="openCategoryModal(${c.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="icon-mini del" onclick="confirmDeleteCategory(${c.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></button>
+      </div></td>
+    </tr>`;
+      }).join('');
+    }
+    $('#catSearch').addEventListener('input', renderCategories);
+    function openCategoryModal(id) {
+      editingCategoryId = id || null;
+      if (id) {
+        const c = CATEGORIES.find(x => x.id === id);
+        $('#catModalTitle').textContent = 'Edit Category';
+        $('#cName').value = c.name; $('#cSlug').value = c.slug; $('#cOrder').value = c.order;
+      } else {
+        $('#catModalTitle').textContent = 'Add Category';
+        $('#cName').value = ''; $('#cSlug').value = ''; $('#cOrder').value = CATEGORIES.length + 1;
+      }
+      $('#catModalOverlay').classList.add('show'); $('#catModal').classList.add('show');
+    }
+    function closeCategoryModal() { $('#catModalOverlay').classList.remove('show'); $('#catModal').classList.remove('show'); }
+    function saveCategory() {
+      const name = $('#cName').value.trim();
+      if (!name) { showToast('Category name is required'); return; }
+      const slug = $('#cSlug').value.trim() || name.toLowerCase().replace(/\s+/g, '-');
+      const order = parseInt($('#cOrder').value) || 1;
+      if (editingCategoryId) {
+        const idx = CATEGORIES.findIndex(c => c.id === editingCategoryId);
+        CATEGORIES[idx] = { ...CATEGORIES[idx], name, slug, order };
+        showToast('Category updated');
+      } else {
+        CATEGORIES.push({ id: nextCatId++, name, slug, order });
+        showToast('Category added');
+      }
+      closeCategoryModal();
+      populateCategorySelects();
+      renderAll();
+    }
+    function confirmDeleteCategory(id) {
+      openConfirm(() => {
+        CATEGORIES = CATEGORIES.filter(c => c.id !== id);
+        populateCategorySelects();
+        renderAll();
+        showToast('Category deleted');
+      });
+    }
+
+
+
+    /* ============================================================
+       REVIEWS
+       ============================================================ */
+    function renderReviews() {
+      $('#reviewsTable').innerHTML = REVIEWS.map(r => {
+        const p = PRODUCTS.find(x => String(x.id) === String(r.productId));
+        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+        return `<tr>
+      <td><b style="font-family:var(--font-sub); color:var(--maroon);">${r.customer}</b>${r.verified ? '<div style="font-size:10px; color:var(--ok);">Verified Purchase</div>' : ''}</td>
+      <td>${p ? p.name : '—'}</td>
+      <td style="color:var(--gold-deep); letter-spacing:1px;">${stars}</td>
+      <td style="max-width:260px;">${r.comment}</td>
+      <td>${r.status === 'approved' ? '<span class="pill ok">Approved</span>' : '<span class="pill warn">Pending</span>'}</td>
+      <td><div class="row-actions">
+        ${r.status !== 'approved' ? `<button class="icon-mini" onclick="setReviewStatus(${r.id},'approved')" title="Approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg></button>` : ''}
+        <button class="icon-mini del" onclick="confirmDeleteReview(${r.id})" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></button>
+      </div></td>
+    </tr>`;
+      }).join('');
+    }
+    function setReviewStatus(id, status) {
+      const r = REVIEWS.find(x => x.id === id); if (r) { r.status = status; renderAll(); showToast('Review ' + status); }
+    }
+    function confirmDeleteReview(id) {
+      openConfirm(() => { REVIEWS = REVIEWS.filter(r => r.id !== id); renderAll(); showToast('Review deleted'); });
+    }
+
+    /* ============================================================
+       ANALYTICS — hand-drawn SVG charts (no external chart libs)
+       ============================================================ */
+    function drawBarChart(svgId, data) {
+      const svg = $('#' + svgId); if (!svg) return;
+      const w = 560, h = 220, padL = 40, padB = 30, padT = 10;
+      const max = Math.max(...data.map(d => d.value), 1);
+      const barW = (w - padL - 20) / data.length - 10;
+      let s = `<line x1="${padL}" y1="${h - padB}" x2="${w - 10}" y2="${h - padB}" stroke="#ddd"/>`;
+      data.forEach((d, i) => {
+        const x = padL + i * ((w - padL - 20) / data.length) + 5;
+        const bh = (d.value / max) * (h - padB - padT);
+        const y = h - padB - bh;
+        s += `<rect x="${x}" y="${y}" width="${barW}" height="${bh}" rx="4" fill="url(#barg)"/>`;
+        s += `<text x="${x + barW / 2}" y="${h - padB + 14}" font-size="8.5" fill="#5B5B5B" text-anchor="middle">${d.label.slice(0, 8)}</text>`;
+      });
+      s = `<defs><linearGradient id="barg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#92003A"/></linearGradient></defs>` + s;
+      svg.innerHTML = s;
+    }
+    function drawLineChart(svgId, values) {
+      const svg = $('#' + svgId); if (!svg) return;
+      const w = 560, h = 220, padL = 30, padB = 26, padT = 14;
+      const max = Math.max(...values, 1);
+      const stepX = (w - padL - 20) / (values.length - 1);
+      let points = values.map((v, i) => `${padL + i * stepX},${h - padB - (v / max) * (h - padB - padT)}`).join(' ');
+      let dots = values.map((v, i) => `<circle cx="${padL + i * stepX}" cy="${h - padB - (v / max) * (h - padB - padT)}" r="3.5" fill="#92003A"/>`).join('');
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      let labels = values.map((v, i) => `<text x="${padL + i * stepX}" y="${h - padB + 16}" font-size="9" fill="#5B5B5B" text-anchor="middle">${days[i] || ''}</text>`).join('');
+      svg.innerHTML = `<line x1="${padL}" y1="${h - padB}" x2="${w - 10}" y2="${h - padB}" stroke="#ddd"/>
+    <polyline points="${points}" fill="none" stroke="#D4AF37" stroke-width="2.5"/>${dots}${labels}`;
+    }
+    function drawDonutChart(svgId, data, legendId) {
+      const svg = $('#' + svgId); if (!svg) return;
+      const total = data.reduce((s, d) => s + d.value, 0) || 1;
+      const colors = ['#92003A', '#D4AF37', '#C08A83', '#A9812A', '#C0004D', '#5B5B5B', '#F0D889', '#300708', '#7a5a17', '#b8790e'];
+      let angle = -90, s = '';
+      const cx = 110, cy = 110, r = 90, ir = 55;
+      data.forEach((d, i) => {
+        const frac = d.value / total;
+        const a2 = angle + frac * 360;
+        const large = frac > 0.5 ? 1 : 0;
+        const x1 = cx + r * Math.cos(angle * Math.PI / 180), y1 = cy + r * Math.sin(angle * Math.PI / 180);
+        const x2 = cx + r * Math.cos(a2 * Math.PI / 180), y2 = cy + r * Math.sin(a2 * Math.PI / 180);
+        const xi1 = cx + ir * Math.cos(angle * Math.PI / 180), yi1 = cy + ir * Math.sin(angle * Math.PI / 180);
+        const xi2 = cx + ir * Math.cos(a2 * Math.PI / 180), yi2 = cy + ir * Math.sin(a2 * Math.PI / 180);
+        s += `<path d="M${xi1} ${yi1} L${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} L${xi2} ${yi2} A${ir} ${ir} 0 ${large} 0 ${xi1} ${yi1} Z" fill="${colors[i % colors.length]}"/>`;
+        angle = a2;
+      });
+      svg.innerHTML = s;
+      if (legendId) $('#' + legendId).innerHTML = data.map((d, i) => `<span><i style="background:${colors[i % colors.length]}"></i>${d.label} (${d.value})</span>`).join('');
+    }
+    function renderAnalytics() {
+      drawLineChart('lineChart', [12, 18, 9, 24, 30, 22, 17]);
+      const byCat = {};
+      CATEGORIES.forEach(c => byCat[c.name] = 0);
+      PRODUCTS.forEach(p => { const c = CATEGORIES.find(x => x.slug === p.category); if (c) byCat[c.name] += 1; });
+      drawDonutChart('donutChart', Object.entries(byCat).map(([label, value]) => ({ label, value })), 'donutLegend');
+
+      const top = [...PRODUCTS].map(p => ({ ...p, margin: p.mrp > 0 ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0 })).sort((a, b) => b.margin - a.margin).slice(0, 6);
+      $('#topProdTable').innerHTML = top.map(p => `
+    <tr>
+      <td><div class="row-prod"><div class="row-thumb">${iconFor(p.category)}</div><b>${p.name}</b></div></td>
+      <td style="text-transform:capitalize;">${p.category}</td>
+      <td>${rupee(p.price)}</td>
+      <td><span class="pill ok">${p.margin}%</span></td>
+    </tr>`).join('');
+    }
+
+    /* ============================================================
+       IMPORT / EXPORT (JSON ONLY)
+       ============================================================ */
+    /* ============================================================
+       IMPORT / EXPORT (JSON ONLY)
+       ============================================================ */
+    function exportData() {
+      let currentRates = { gold22k: 7842, gold24k: 8550, silver: 98 };
+      try {
+        const cached = localStorage.getItem('MM_RATES');
+        if (cached) currentRates = JSON.parse(cached);
+      } catch (e) {}
+
+      const exportPayload = {
+        meta: {
+          exportedAt: new Date().toISOString(),
+          store: "MM Jewellery",
+          rates: currentRates
+        },
+        rates: currentRates,
+        products: PRODUCTS
+      };
+
+      const dataStr = JSON.stringify(exportPayload, null, 2);
+      downloadFile('mm-jewellery-products.json', dataStr, 'application/json');
+      showToast('Exported catalogue & live rates to JSON');
+    }
+
+    function downloadFile(filename, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    $('#importDrop').addEventListener('dragover', e => { e.preventDefault(); $('#importDrop').classList.add('drag'); });
+    $('#importDrop').addEventListener('dragleave', () => $('#importDrop').classList.remove('drag'));
+    $('#importDrop').addEventListener('drop', e => {
+      e.preventDefault(); $('#importDrop').classList.remove('drag');
+      if (e.dataTransfer.files.length) parseImportFile(e.dataTransfer.files[0]);
+    });
+
+    function handleImportFile(e) { if (e.target.files.length) parseImportFile(e.target.files[0]); e.target.value = ''; }
+
+    function parseImportFile(file) {
+      if (!file) return;
+      const fileName = (file.name || '').toLowerCase();
+      if (!fileName.endsWith('.json') && !fileName.endsWith('.txt') && file.type !== 'application/json') {
+        $('#importStatus').textContent = 'Invalid file format — please select a .json file.';
+        showToast('Only .json files are supported');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          let rawText = e.target.result || '';
+          // Strip UTF-8 Byte Order Mark (BOM) if present
+          if (rawText.charCodeAt(0) === 0xFEFF) {
+            rawText = rawText.slice(1);
+          }
+          rawText = rawText.trim();
+
+          let parsedData;
+          try {
+            parsedData = JSON.parse(rawText);
+          } catch (jsonErr) {
+            console.error('JSON Parse Syntax Error:', jsonErr);
+            $('#importStatus').textContent = `JSON Syntax Error: ${jsonErr.message}. Please check your file formatting.`;
+            showToast('Invalid JSON syntax in file');
+            return;
+          }
+
+          // Import rates if included in JSON payload
+          if (parsedData && typeof parsedData === 'object') {
+            const impRates = parsedData.rates || (parsedData.meta && parsedData.meta.rates);
+            if (impRates && typeof impRates === 'object') {
+              commitRates(
+                parseFloat(impRates.gold22k || impRates.gold22 || 7842) || 7842,
+                parseFloat(impRates.gold24k || impRates.gold24 || 8550) || 8550,
+                parseFloat(impRates.silver || 98) || 98
+              );
+            }
+          }
+
+          let items = parsedData;
+          // Unwrap wrapped container objects (e.g. { "products": [...] }, { "data": [...] }, { "items": [...] })
+          if (!Array.isArray(parsedData) && typeof parsedData === 'object' && parsedData !== null) {
+            if (Array.isArray(parsedData.products)) items = parsedData.products;
+            else if (Array.isArray(parsedData.items)) items = parsedData.items;
+            else if (Array.isArray(parsedData.data)) items = parsedData.data;
+            else if (Array.isArray(parsedData.catalogue)) items = parsedData.catalogue;
+            else if (Array.isArray(parsedData.result)) items = parsedData.result;
+            else if (parsedData.name || parsedData.code || parsedData.title || parsedData.sku) items = [parsedData];
+            else {
+              const firstArrayVal = Object.values(parsedData).find(v => Array.isArray(v));
+              if (firstArrayVal) items = firstArrayVal;
+              else items = [parsedData];
+            }
+          }
+
+          if (!Array.isArray(items) || !items.length) {
+            $('#importStatus').textContent = 'No items found in JSON file — please check the file content.';
+            showToast('No items found in JSON');
+            return;
+          }
+
+          let count = 0;
+          const itemsToSync = [];
+
+          items.forEach((it, idx) => {
+            if (!it || typeof it !== 'object') return;
+
+            const name = String(it.name || it.title || it.product_name || it.productName || it.code || it.sku || '').trim();
+            const code = String(it.code || it.sku || it.product_code || it.productCode || it.id || ('AJ-' + (PRODUCTS.length + count + 100))).trim();
+
+            if (!name && !code) return;
+
+            const rawCat = it.cat || it.category || it.category_name || it.categoryName || 'rings';
+            const category = String(rawCat).toLowerCase().trim() || 'rings';
+
+            let images = [];
+            if (Array.isArray(it.images) && it.images.length) images = it.images;
+            else if (Array.isArray(it.imgs) && it.imgs.length) images = it.imgs;
+            else if (typeof it.images === 'string' && it.images.trim()) images = [it.images.trim()];
+            else if (typeof it.img === 'string' && it.img.trim()) images = [it.img.trim()];
+            else if (typeof it.image === 'string' && it.image.trim()) images = [it.image.trim()];
+
+            const price = parseFloat(it.price || it.salePrice || it.sale_price || it.mrp || 0) || 0;
+            const mrp = parseFloat(it.mrp || it.originalPrice || it.original_price || it.regular_price || price) || price;
+            const grossWt = parseFloat(it.grossWt || it.gross_weight || it.wt || it.weight || 0) || 0;
+            const rawId = it.id !== undefined && it.id !== null ? String(it.id) : code;
+            const idStr = String(rawId).replace(/[\s\/#?]/g, '-');
+
+            const vaStr = String(it.va || it.valueAddition || it.value_addition || it.VA || '').trim();
+            const itemData = {
+              id: idStr,
+              name: name || 'Untitled Piece',
+              code: code || ('AJ-' + (PRODUCTS.length + count + 100)),
+              cat: category,
+              category: category,
+              subCategory: String(it.subCategory || it.sub_category || it.subCategoryName || '').trim(),
+              va: vaStr,
+              valueAddition: vaStr,
+              shortDesc: String(it.shortDesc || it.short_description || it.summary || '').trim(),
+              desc: String(it.desc || it.description || it.full_description || it.shortDesc || '').trim(),
+              grossWt: grossWt,
+              netWt: parseFloat(it.netWt || it.net_weight || grossWt) || 0,
+              wt: it.wt ? String(it.wt) : (grossWt > 0 ? `${grossWt}g` : '4g'),
+              purity: String(it.purity || '22K/916').trim(),
+              metal: String(it.metal || it.metal_type || 'Yellow Gold').trim(),
+              color: String(it.color || 'Yellow').trim(),
+              hallmark: String(it.hallmark || 'BIS 916 Hallmarked').trim(),
+              mrp: mrp,
+              price: price,
+              availability: 'Made to Order',
+              isVisible: it.isVisible !== undefined ? Boolean(it.isVisible) : true,
+              displayOrder: parseInt(it.displayOrder || it.display_order || it.order || (PRODUCTS.length + count + 1)) || (PRODUCTS.length + count + 1),
+              tag: String(it.tag || '').trim(),
+              images: images,
+              createdAt: it.createdAt || new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+
+            const existingIdx = PRODUCTS.findIndex(p => String(p.id) === idStr || String(p.code) === itemData.code);
+            if (existingIdx !== -1) {
+              PRODUCTS[existingIdx] = { ...PRODUCTS[existingIdx], ...itemData };
+            } else {
+              PRODUCTS.unshift(itemData);
+            }
+
+            itemsToSync.push(itemData);
+            count++;
+          });
+
+          if (count === 0) {
+            $('#importStatus').textContent = 'No valid products found in JSON file. Please ensure items contain a name or code.';
+            showToast('No valid product records found');
+            return;
+          }
+
+          if (FIREBASE_READY && db && itemsToSync.length > 0) {
+            try {
+              // Batch in chunks of 400 (Firestore limit is 500 per batch)
+              for (let i = 0; i < itemsToSync.length; i += 400) {
+                const chunk = itemsToSync.slice(i, i + 400);
+                const batch = db.batch();
+                chunk.forEach(itemData => {
+                  const docRef = db.collection('products').doc(itemData.id);
+                  batch.set(docRef, itemData, { merge: true });
+                });
+                await batch.commit();
+              }
+              console.log(`🔥 [Firestore API] Bulk imported ${count} items to Firestore.`);
+            } catch (fErr) {
+              console.warn("Firestore batch import notice:", fErr);
+            }
+          }
+
+          persistProducts();
+          renderAll();
+          $('#importStatus').textContent = `Successfully imported ${count} product(s).`;
+          showToast(`Imported ${count} products`);
+        } catch (err) {
+          console.error('Import parse error:', err);
+          $('#importStatus').textContent = `Could not parse JSON file — ${err.message || 'verify file structure.'}`;
+          showToast('Error parsing JSON file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ============================================================
+       SETTINGS
+       ============================================================ */
+    function connectFirebase() {
+      const config = {
+        apiKey: $('#fbApiKey').value.trim(),
+        authDomain: $('#fbAuthDomain').value.trim(),
+        projectId: $('#fbProjectId').value.trim(),
+        storageBucket: $('#fbStorageBucket').value.trim(),
+        messagingSenderId: $('#fbSenderId').value.trim(),
+        appId: $('#fbAppId').value.trim()
+      };
+      tryInitFirebase(config);
+      showToast(FIREBASE_READY ? 'Firebase connected successfully' : 'Could not connect — check your config values');
+    }
+    async function commitRates(gold22k, gold24k, silver) {
+      const updatedAt = new Date().toISOString();
+      const ratesData = { gold22k, gold24k, silver, updatedAt };
+
+      try { localStorage.setItem('MM_RATES', JSON.stringify(ratesData)); } catch (e) {}
+
+      applyRatesToAllFields(ratesData);
+
+      if (FIREBASE_READY && db) {
+        try {
+          await db.collection('rates').doc('latest').set(ratesData, { merge: true });
+          showToast('Live Gold & Silver Rates saved & updated in Firestore!');
+        } catch (err) {
+          console.error("Firestore save rates error:", err);
+          showToast('Rates saved locally (Firestore error: ' + err.message + ')');
+        }
+      } else {
+        showToast('Live Gold & Silver Rates saved locally');
+      }
+    }
+
+    function saveDashRates() {
+      const g22 = parseFloat($('#dashSetGoldRate') ? $('#dashSetGoldRate').value : 0) || 7842;
+      const g24 = parseFloat($('#dashSetGold24k') ? $('#dashSetGold24k').value : 0) || 8550;
+      const sil = parseFloat($('#dashSetSilverRate') ? $('#dashSetSilverRate').value : 0) || 98;
+      commitRates(g22, g24, sil);
+    }
+
+    function saveViewRates() {
+      const g22 = parseFloat($('#ratesViewGold22k') ? $('#ratesViewGold22k').value : 0) || 7842;
+      const g24 = parseFloat($('#ratesViewGold24k') ? $('#ratesViewGold24k').value : 0) || 8550;
+      const sil = parseFloat($('#ratesViewSilver') ? $('#ratesViewSilver').value : 0) || 98;
+      commitRates(g22, g24, sil);
+    }
+
+    async function saveStoreSettings() {
+      const gold22k = $('#setGoldRate') ? (parseFloat($('#setGoldRate').value) || 0) : 7842;
+      const gold24k = $('#setGold24k') ? (parseFloat($('#setGold24k').value) || 0) : 8550;
+      const silver = $('#setSilverRate') ? (parseFloat($('#setSilverRate').value) || 0) : 98;
+      await commitRates(gold22k, gold24k, silver);
+    }
+
+    function applyRatesToAllFields(data) {
+      if (!data) return;
+      const g22 = data.gold22k || data.gold22 || 7842;
+      const g24 = data.gold24k || data.gold24 || 8550;
+      const sil = data.silver || 98;
+      const formattedTime = data.updatedAt
+        ? 'Last Updated: ' + new Date(data.updatedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+        : '';
+
+      ['setGoldRate', 'dashSetGoldRate', 'ratesViewGold22k'].forEach(id => { const el = $('#' + id); if (el) el.value = g22; });
+      ['setGold24k', 'dashSetGold24k', 'ratesViewGold24k'].forEach(id => { const el = $('#' + id); if (el) el.value = g24; });
+      ['setSilverRate', 'dashSetSilverRate', 'ratesViewSilver'].forEach(id => { const el = $('#' + id); if (el) el.value = sil; });
+      ['rateLastUpdated', 'dashRateLastUpdated', 'ratesViewLastUpdated'].forEach(id => { const el = $('#' + id); if (el) el.textContent = formattedTime; });
+    }
+
+    let adminRatesUnsubscribe = null;
+
+    function initAdminRates() {
+      // 1. Immediately load from localStorage on page load
+      try {
+        const cached = localStorage.getItem('MM_RATES');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && typeof parsed === 'object') {
+            applyRatesToAllFields(parsed);
+          }
+        }
+      } catch (e) {}
+
+      // 2. Real-time Firestore sync and auto-seed fallback
+      if (FIREBASE_READY && db) {
+        if (adminRatesUnsubscribe) {
+          try { adminRatesUnsubscribe(); } catch (e) {}
+        }
+        adminRatesUnsubscribe = db.collection('rates').doc('latest').onSnapshot(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            applyRatesToAllFields(data);
+            try { localStorage.setItem('MM_RATES', JSON.stringify(data)); } catch (e) {}
+          } else {
+            // Seed Firestore with initial rates if doc does not exist yet
+            const defaultRates = {
+              gold22k: 7842,
+              gold24k: 8550,
+              silver: 98,
+              updatedAt: new Date().toISOString()
+            };
+            db.collection('rates').doc('latest').set(defaultRates, { merge: true });
+            applyRatesToAllFields(defaultRates);
+            try { localStorage.setItem('MM_RATES', JSON.stringify(defaultRates)); } catch (e) {}
+          }
+        }, err => console.warn("Admin rates listener notice:", err));
+      }
+    }
+
+    function openAdminProdDetailsModal(id) {
+      const targetId = String(id);
+      const p = PRODUCTS.find(x => String(x.id) === targetId || String(x.code) === targetId);
+      if (!p) { showToast('Product not found'); return; }
+
+      const imgUrl = (p.images && p.images.length && p.images[0]) ? p.images[0] : (p.img || p.image || 'logo.png');
+      const vaVal = p.va || p.valueAddition || 'N/A';
+
+      $('#adminProdDetailsTitle').textContent = p.name || 'Product Details';
+      $('#adminProdDetailsBody').innerHTML = `
+        <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:20px; align-items:center;">
+          <img src="${imgUrl}" alt="${p.name}" style="width:110px; height:110px; object-fit:cover; border-radius:12px; border:1px solid rgba(146,0,58,.15);" onerror="this.onerror=null; this.src='logo.png';">
+          <div>
+            <h3 style="color:var(--maroon); font-family:var(--font-display); font-size:20px;">${p.name}</h3>
+            <div style="font-size:12.5px; color:var(--ink-soft); margin-top:4px;">Product Code: <b>${p.code}</b></div>
+            <div style="font-size:12.5px; color:var(--maroon); font-weight:600; margin-top:2px;">Category: ${p.category || p.cat} ${p.subCategory ? ' · ' + p.subCategory : ''}</div>
+            <div style="margin-top:6px;"><span class="pill ok" style="font-size:11px;">Made to Order</span></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; background:var(--ivory); padding:16px; border-radius:14px; border:1px solid rgba(146,0,58,.12); margin-bottom:20px;">
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">VALUE ADDITION (V.A)</span><div style="font-weight:700; color:var(--maroon); font-size:14px;">${vaVal}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">SALE PRICE</span><div style="font-weight:700; color:var(--ink); font-size:14px;">${rupee(p.price)}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">ORIGINAL PRICE</span><div style="font-weight:600; color:#888; font-size:13px; text-decoration:line-through;">${rupee(p.mrp)}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">PURITY</span><div style="font-weight:600; font-size:13px;">${p.purity || '22K/916'}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">GROSS WEIGHT</span><div style="font-weight:600; font-size:13px;">${p.grossWt ? p.grossWt + 'g' : (p.wt || '—')}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">NET WEIGHT</span><div style="font-weight:600; font-size:13px;">${p.netWt ? p.netWt + 'g' : '—'}</div></div>
+          <div><span style="font-size:10px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;">METAL TYPE</span><div style="font-weight:600; font-size:13px;">${p.metal || 'Yellow Gold'}</div></div>
+        </div>
+        <div style="margin-bottom:12px;"><b style="font-size:12px; color:var(--ink-soft); text-transform:uppercase;">Description</b><p style="font-size:13px; color:var(--ink); line-height:1.6; margin-top:4px;">${p.desc || p.description || p.shortDesc || 'No description provided.'}</p></div>
+      `;
+      $('#adminProdDetailsOverlay').classList.add('show');
+      $('#adminProdDetailsModal').classList.add('show');
+    }
+
+    function closeAdminProdDetailsModal() {
+      $('#adminProdDetailsOverlay').classList.remove('show');
+      $('#adminProdDetailsModal').classList.remove('show');
+    }
+
+    /* ============================================================
+       CONFIRM DIALOG
+       ============================================================ */
+    function openConfirm(msgOrCb, cb) {
+      const onConfirm = typeof msgOrCb === 'function' ? msgOrCb : cb;
+      if (typeof msgOrCb === 'string') {
+        const msgEl = $('#confirmBoxMsg');
+        if (msgEl) msgEl.textContent = msgOrCb;
+      }
+      $('#confirmOverlay').classList.add('show');
+      const btn = $('#confirmDeleteBtn');
+      if (btn) {
+        btn.onclick = (e) => {
+          e.preventDefault();
+          if (typeof onConfirm === 'function') onConfirm();
+          closeConfirm();
+        };
+      }
+    }
+    function closeConfirm() { $('#confirmOverlay').classList.remove('show'); }
+
+    /* ---------- Android Edge Swipe Navigation ---------- */
+    function initAdminAndroidSwipe() {
+      let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+
+      document.addEventListener('touchstart', e => {
+        if (!e.touches || e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }, { passive: true });
+
+      document.addEventListener('touchend', e => {
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        const duration = Date.now() - touchStartTime;
+
+        if (duration > 600 || Math.abs(deltaY) > 80) return;
+
+        const isLeftEdge = touchStartX <= 40;
+        const isRightEdge = touchStartX >= window.innerWidth - 40;
+
+        if (isLeftEdge && deltaX > 50) {
+          if ($('#prodModalOverlay') && $('#prodModalOverlay').classList.contains('show')) {
+            closeProductModal();
+            return;
+          }
+          if ($('#adminProdDetailsOverlay') && $('#adminProdDetailsOverlay').classList.contains('show')) {
+            closeAdminProdDetailsModal();
+            return;
+          }
+          if ($('#catModalOverlay') && $('#catModalOverlay').classList.contains('show')) {
+            closeCategoryModal();
+            return;
+          }
+          if ($('#sidebar') && $('#sidebar').classList.contains('show')) {
+            toggleSidebar(false);
+            return;
+          }
+          if (window.history.length > 1) {
+            window.history.back();
+          }
+        }
+
+        if (isRightEdge && deltaX < -50) {
+          if (window.history.length > 1) {
+            window.history.forward();
+          }
+        }
+      }, { passive: true });
+    }
+
+    /* ============================================================
+       MASTER RENDER
+       ============================================================ */
+    function renderAll() {
+      populateCategorySelects();
+      renderDashboard();
+      renderProducts();
+      renderCategories();
+      renderReviews();
+      renderAnalytics();
+      initAdminRates();
+      initAdminAndroidSwipe();
+    }
+  </script>
+</body>
+
+</html>

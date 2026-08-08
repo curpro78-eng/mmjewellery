@@ -1,0 +1,213 @@
+[
+  {
+    "id": "MM-IMP-101",
+    "name": "Kundan Choker Bridal Necklace Set",
+    "code": "MM-IMP-101",
+    "category": "necklace",
+    "subCategory": "Casting Necklace",
+    "va": "12%",
+    "shortDesc": "Handcrafted 22K gold Kundan choker necklace with matching earrings.",
+    "desc": "Exquisite 22K yellow gold Kundan choker necklace set featuring intricate meenakari work, royal gemstones, and BIS 916 certification.",
+    "grossWt": 68.5,
+    "netWt": 62.0,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 520000,
+    "price": 495000,
+    "availability": "Made to Order",
+    "images": [
+      "images/choker_necklace.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-102",
+    "name": "Antique Lakshmi Temple Haram",
+    "code": "MM-IMP-102",
+    "category": "haram",
+    "subCategory": "Temple Jewellery",
+    "shortDesc": "Traditional South Indian temple haram engraved with Goddess Lakshmi.",
+    "desc": "Authentic antique finish 22K gold long haram crafted by heritage artisans in Salem. Features ruby emerald stone embellishments.",
+    "grossWt": 85.0,
+    "netWt": 81.2,
+    "purity": "22K/916",
+    "metal": "Antique Gold",
+    "color": "Antique Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 645000,
+    "price": 618000,
+    "availability": "Made to Order",
+    "images": [
+      "3.webp"
+    ]
+  },
+  {
+    "id": "MM-IMP-103",
+    "name": "Solitaire Cut Diamond Gold Ring",
+    "code": "MM-IMP-103",
+    "category": "rings",
+    "subCategory": "Diamond Ring",
+    "shortDesc": "Classic 18K gold ring mounted with a brilliant solitaire diamond.",
+    "desc": "Modern 18K yellow gold band featuring a certified VVS-EF clarity solitaire diamond. Ideal for anniversaries and special engagements.",
+    "grossWt": 4.8,
+    "netWt": 4.5,
+    "purity": "18K/750",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 750 Hallmarked",
+    "mrp": 88000,
+    "price": 82500,
+    "availability": "Made to Order",
+    "images": [
+      "images/diamond_solitaire.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-104",
+    "name": "Heritage Emerald Cut Gemstone Ring",
+    "code": "MM-IMP-104",
+    "category": "rings",
+    "subCategory": "Cocktail Ring",
+    "shortDesc": "Statement cocktail ring with a natural emerald centerpiece.",
+    "desc": "Bold 22K gold cocktail ring featuring an emerald-cut gemstone surrounded by micro-pave cubic zirconia accents.",
+    "grossWt": 8.2,
+    "netWt": 7.6,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 62000,
+    "price": 57900,
+    "availability": "Made to Order",
+    "images": [
+      "images/emerald_cut_ring.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-105",
+    "name": "Royal Peacock Jhumka Earrings",
+    "code": "MM-IMP-105",
+    "category": "earrings",
+    "subCategory": "Jhumka",
+    "shortDesc": "Traditional peacock engraved hanging jhumkas with pearl drops.",
+    "desc": "Heavy 22K gold jhumka earrings featuring detailed peacock motifs and freshwater cultured pearl hangings.",
+    "grossWt": 18.4,
+    "netWt": 17.5,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 138000,
+    "price": 129500,
+    "availability": "Made to Order",
+    "images": [
+      "images/sapphire_earrings.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-106",
+    "name": "Kada Style Broad Casting Bangle",
+    "code": "MM-IMP-106",
+    "category": "bangles",
+    "subCategory": "Casting Bangle",
+    "shortDesc": "Solid 22K gold kada bangle with textured geometric carving.",
+    "desc": "Premium broad casting kada bangle with high polish gold finish and secure screw closure mechanism.",
+    "grossWt": 28.0,
+    "netWt": 27.5,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 210000,
+    "price": 198000,
+    "availability": "Made to Order",
+    "images": [
+      "images/bangle.png"
+    ]
+  },
+  {
+    "id": "MM-IMP-107",
+    "name": "Classic Hollow Rope Gold Chain",
+    "code": "MM-IMP-107",
+    "category": "chains",
+    "subCategory": "Rope Chain",
+    "shortDesc": "24-inch daily wear lightweight hollow rope gold chain.",
+    "desc": "Durable and lightweight 22K gold rope chain crafted with precision Italian technology for daily style.",
+    "grossWt": 14.2,
+    "netWt": 14.2,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 105000,
+    "price": 99500,
+    "availability": "Made to Order",
+    "images": [
+      "images/chain.png"
+    ]
+  },
+  {
+    "id": "MM-IMP-108",
+    "name": "Ruby Floral Gold Pendant",
+    "code": "MM-IMP-108",
+    "category": "pendants",
+    "subCategory": "Floral Pendant",
+    "shortDesc": "Delicate flower pendant studded with natural red rubies.",
+    "desc": "Charming floral pendant crafted in 22K yellow gold with fine ruby petals. Perfect for daily wear and gifting.",
+    "grossWt": 5.4,
+    "netWt": 5.0,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 42000,
+    "price": 38900,
+    "availability": "Made to Order",
+    "images": [
+      "images/ruby_pendant.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-109",
+    "name": "Flexible Italian Tennis Bracelet",
+    "code": "MM-IMP-109",
+    "category": "bracelets",
+    "subCategory": "Tennis Bracelet",
+    "shortDesc": "Sleek flexible gold bracelet studded with cubic zirconia.",
+    "desc": "Elegant 18K yellow gold tennis bracelet with brilliant-cut stone links and a double-lock safety clasp.",
+    "grossWt": 12.6,
+    "netWt": 11.8,
+    "purity": "18K/750",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 750 Hallmarked",
+    "mrp": 92000,
+    "price": 86000,
+    "availability": "Made to Order",
+    "images": [
+      "1.jpg"
+    ]
+  },
+  {
+    "id": "MM-IMP-110",
+    "name": "Grand Wedding Combo Jewellery Set",
+    "code": "MM-IMP-110",
+    "category": "sets",
+    "subCategory": "Bridal Combo",
+    "shortDesc": "Complete 4-piece bridal collection: Short necklace, Haram, Earrings & Bangles.",
+    "desc": "Ultimate 22K gold wedding collection crafted for grand occasions. Includes matching short necklace, long haram, jhumka earrings, and a pair of broad bangles.",
+    "grossWt": 155.0,
+    "netWt": 146.5,
+    "purity": "22K/916",
+    "metal": "Yellow Gold",
+    "color": "Yellow",
+    "hallmark": "BIS 916 Hallmarked",
+    "mrp": 1180000,
+    "price": 1125000,
+    "availability": "Made to Order",
+    "images": [
+      "images/classic_gold_ring.jpg"
+    ]
+  }
+]
